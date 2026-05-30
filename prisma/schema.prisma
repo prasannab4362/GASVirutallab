@@ -1,0 +1,221 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  MENTOR
+  STUDENT
+}
+
+enum ProjectStatus {
+  ASSIGNED
+  IN_PROGRESS
+  REVIEW
+  APPROVED
+  COMPLETED
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  GRADED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  PARTIAL
+  INACTIVE
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  role          Role           @default(STUDENT)
+  profileImage  String?
+  status        String         @default("ACTIVE") // ACTIVE, SUSPENDED
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  student       Student?
+  mentor        Mentor?
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+model Student {
+  id           String        @id @default(uuid())
+  userId       String        @unique
+  matricNumber String?       @unique
+  batchId      String?
+  programId    String?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batch        Batch?        @relation(fields: [batchId], references: [id])
+  program      Program?      @relation(fields: [programId], references: [id])
+  projects     Project[]
+  submissions  Submission[]
+  attendance   Attendance[]
+  certificates Certificate[]
+}
+
+model Mentor {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batches   Batch[]
+  projects  Project[]
+  meetings  Meeting[]
+}
+
+model Program {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  duration     String // e.g. "6 Months"
+  startDate    DateTime
+  endDate      DateTime
+  status       String        @default("ACTIVE") // ACTIVE, ARCHIVED
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  batches      Batch[]
+  students     Student[]
+  certificates Certificate[]
+}
+
+model Batch {
+  id          String       @id @default(uuid())
+  batchCode   String       @unique // e.g., AI-2026-B1
+  programId   String
+  mentorId    String?
+  startDate   DateTime
+  endDate     DateTime
+  status      String       @default("ACTIVE")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  program     Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  mentor      Mentor?      @relation(fields: [mentorId], references: [id])
+  students    Student[]
+  assignments Assignment[]
+  meetings    Meeting[]
+}
+
+model Project {
+  id                 String        @id @default(uuid())
+  title              String
+  description        String
+  mentorId           String
+  studentId          String
+  deadline           DateTime
+  status             ProjectStatus @default(ASSIGNED)
+  progressPercentage Int           @default(0)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  mentor             Mentor        @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  student            Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tasks              ProjectTask[]
+}
+
+model Assignment {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  deadline    DateTime
+  batchId     String
+  status      String       @default("ACTIVE") // ACTIVE, DRAFT, CLOSED
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  batch       Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+}
+
+model Submission {
+  id           String           @id @default(uuid())
+  assignmentId String
+  studentId    String
+  fileUrl      String
+  fileName     String
+  version      Int              @default(1)
+  status       SubmissionStatus @default(SUBMITTED)
+  marks        Int?
+  feedback     String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student      Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  studentId String
+  date      DateTime         @default(now())
+  score     Int // 0-100 calculated by activities
+  status    AttendanceStatus @default(INACTIVE)
+  details   String? // JSON or description of activities
+  createdAt DateTime         @default(now())
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  batchId     String?
+  mentorId    String
+  date        DateTime
+  duration    Int // in minutes
+  joinUrl     String
+  notes       String?
+  status      String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  createdAt   DateTime @default(now())
+  batch       Batch?   @relation(fields: [batchId], references: [id])
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+}
+
+model Certificate {
+  id                String   @id @default(uuid())
+  studentId         String
+  programId         String
+  certificateNumber String   @unique // e.g. GAS-2026-XXXX
+  verificationUrl   String
+  qrCodeData        String
+  issueDate         DateTime @default(now())
+  status            String   @default("VALID") // VALID, REVOKED
+  student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  program           Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String // ALERT, FEEDBACK, MEETING, PLATFORM
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  details   String?
+  timestamp DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model ProjectTask {
+  id        String   @id @default(uuid())
+  projectId String
+  title     String
+  status    String   @default("TODO") // TODO, IN_PROGRESS, COMPLETED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
