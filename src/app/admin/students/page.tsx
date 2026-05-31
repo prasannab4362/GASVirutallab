@@ -46,8 +46,8 @@ export default async function AdminStudentsPage() {
 
       <StudentsManager 
         students={JSON.parse(JSON.stringify(students))} 
-        batches={batches} 
-        programs={programs} 
+        batches={JSON.parse(JSON.stringify(batches))} 
+        programs={JSON.parse(JSON.stringify(programs))} 
       />
     </div>
   );
