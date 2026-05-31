@@ -188,9 +188,9 @@ export async function createProgramAction(
     revalidatePath("/admin/programs");
     revalidatePath("/admin/dashboard");
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Program creation failure:", error);
-    return { success: false, error: "Failed to create program." };
+    return { success: false, error: `Failed to create program: ${error.message || error}` };
   }
 }
 
@@ -251,9 +251,9 @@ export async function createBatchAction(
     revalidatePath("/admin/programs");
     revalidatePath("/admin/dashboard");
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Batch creation failure:", error);
-    return { success: false, error: "Failed to create batch." };
+    return { success: false, error: `Failed to create batch: ${error.message || error}` };
   }
 }
 
