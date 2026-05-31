@@ -127,6 +127,7 @@ export default function LandingPage() {
               <input
                 type="text"
                 required
+                suppressHydrationWarning
                 placeholder="Enter certificate number (e.g. GAS-2026-ALEX)"
                 value={certNumber}
                 onChange={(e) => setCertNumber(e.target.value)}
@@ -135,6 +136,7 @@ export default function LandingPage() {
             </div>
             <button
               type="submit"
+              suppressHydrationWarning
               className="px-6 py-3.5 text-sm font-semibold rounded-2xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-500/20"
             >
               Verify Certificate
@@ -240,9 +242,10 @@ export default function LandingPage() {
                 <input
                   type="text"
                   required
+                  suppressHydrationWarning
                   value={contactForm.name}
                   onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all"
                   placeholder="Alex Jones"
                 />
               </div>
@@ -251,9 +254,10 @@ export default function LandingPage() {
                 <input
                   type="email"
                   required
+                  suppressHydrationWarning
                   value={contactForm.email}
                   onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                  className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-655/20 focus:border-blue-600 transition-all"
                   placeholder="alex@example.com"
                 />
               </div>
@@ -263,14 +267,16 @@ export default function LandingPage() {
               <textarea
                 required
                 rows={4}
+                suppressHydrationWarning
                 value={contactForm.message}
                 onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all"
                 placeholder="Tell us about your background and interest in AI..."
               />
             </div>
             <button
               type="submit"
+              suppressHydrationWarning
               className="w-full py-3.5 text-sm font-semibold rounded-2xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-500/20"
             >
               Send Message
