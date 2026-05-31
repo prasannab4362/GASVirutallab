@@ -22,9 +22,9 @@ export default async function AdminReportsPage() {
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 p-6 shadow-sm space-y-4">
           <FileSpreadsheet className="w-8 h-8 text-blue-600" />
           <div>
-            <h3 className="font-bold text-zinc-950 dark:text-white text-sm">Fellows Gradebook Audit</h3>
+            <h3 className="font-bold text-zinc-955 dark:text-white text-sm">Interns Gradebook Audit</h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-450 leading-relaxed mt-1">
-              Generate a full spreadsheet record of student marks, assignment revisions, and lead mentor review summaries.
+              Generate a full spreadsheet record of intern marks, assignment revisions, and lead mentor review summaries.
             </p>
           </div>
           <button type="button" className="px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/10">
@@ -35,9 +35,9 @@ export default async function AdminReportsPage() {
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 p-6 shadow-sm space-y-4">
           <Calendar className="w-8 h-8 text-blue-600" />
           <div>
-            <h3 className="font-bold text-zinc-950 dark:text-white text-sm">Attendance Check-in Sheets</h3>
+            <h3 className="font-bold text-zinc-955 dark:text-white text-sm">Attendance Check-in Sheets</h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-450 leading-relaxed mt-1">
-              Audit weekly checking patterns, total hours logged, and lecture check-in metrics for cohort fellows.
+              Audit weekly checking patterns, total hours logged, and lecture check-in metrics for cohort interns.
             </p>
           </div>
           <button type="button" className="px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/10">

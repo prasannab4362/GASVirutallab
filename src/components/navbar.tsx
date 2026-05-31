@@ -22,7 +22,9 @@ export default function Navbar({ role, userName, notifications }: NavbarProps) {
   const getPageTitle = () => {
     const segment = pathname.split("/").pop();
     if (!segment || segment === role.toLowerCase()) return "Dashboard";
-    return segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
+    const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
+    if (title.toLowerCase() === "students") return "Interns";
+    return title;
   };
 
   // Define navigation lists based on role for mobile view
@@ -40,14 +42,14 @@ export default function Navbar({ role, userName, notifications }: NavbarProps) {
       case "MENTOR":
         return [
           { name: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
-          { name: "Students", href: "/mentor/students", icon: Users },
+          { name: "Interns", href: "/mentor/students", icon: Users },
           { name: "Reviews", href: "/mentor/reviews", icon: CheckSquare },
           { name: "Meetings", href: "/mentor/meetings", icon: Calendar },
         ];
       case "ADMIN":
         return [
           { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-          { name: "Students", href: "/admin/students", icon: Users },
+          { name: "Interns", href: "/admin/students", icon: Users },
           { name: "Mentors", href: "/admin/mentors", icon: ShieldAlert },
           { name: "Programs", href: "/admin/programs", icon: Layers },
           { name: "Attendance", href: "/admin/attendance", icon: Activity },

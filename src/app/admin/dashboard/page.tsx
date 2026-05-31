@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
 
   const chartData = programs.map(p => ({
     name: p.title.length > 15 ? p.title.substring(0, 15) + "..." : p.title,
-    students: p.students.length
+    interns: p.students.length
   }));
 
   // Fetch recent audit logs
@@ -61,9 +61,9 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 p-6 flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Students</span>
+            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Interns</span>
             <span className="text-2xl font-bold text-zinc-950 dark:text-white block font-mono">{totalStudents}</span>
-            <span className="text-xs text-zinc-500 block mt-0.5">Enrolled fellows</span>
+            <span className="text-xs text-zinc-500 block mt-0.5">Enrolled interns</span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
             <Users className="w-5.5 h-5.5" />
@@ -111,7 +111,7 @@ export default async function AdminDashboardPage() {
         <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 p-6 shadow-sm flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Fellowship Distribution</h3>
+              <h3 className="text-sm font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Internship Distribution</h3>
               <span className="text-[10px] text-zinc-450 flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-green-550" />
                 <span>Active enrollments</span>

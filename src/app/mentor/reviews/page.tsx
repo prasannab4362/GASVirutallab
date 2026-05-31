@@ -36,7 +36,7 @@ export default async function MentorReviewsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Submission Evaluations</h1>
         <p className="text-xs sm:text-sm text-zinc-550 dark:text-zinc-400 mt-1">
-          Review challenge notebooks, check code files, assign grades, and write pedagogical feedback for student submissions.
+          Review challenge notebooks, check code files, assign grades, and write pedagogical feedback for intern submissions.
         </p>
       </div>
 
@@ -45,7 +45,7 @@ export default async function MentorReviewsPage() {
           <CheckSquare className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mb-3" />
           <h3 className="text-base font-bold text-zinc-950 dark:text-white">No Submissions Found</h3>
           <p className="text-zinc-500 text-xs sm:text-sm mt-1 max-w-sm">
-            Students in your cohort have not submitted any assignments or tasks yet.
+            Interns in your cohort have not submitted any assignments or tasks yet.
           </p>
         </div>
       ) : (

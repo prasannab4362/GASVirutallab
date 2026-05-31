@@ -112,7 +112,7 @@ export default async function MentorDashboardPage() {
           <div className="space-y-1">
             <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Total Mentees</span>
             <span className="text-2xl font-bold text-zinc-950 dark:text-white block font-mono">{totalMentees}</span>
-            <span className="text-xs text-zinc-500 block mt-1">Students enrolled</span>
+            <span className="text-xs text-zinc-500 block mt-1">Interns enrolled</span>
           </div>
           <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
             <Users className="w-6 h-6" />
@@ -237,7 +237,7 @@ export default async function MentorDashboardPage() {
                           {new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}
                         </td>
                         <td className="py-3.5 px-2 font-semibold text-zinc-700 dark:text-zinc-300">
-                          {b.students.length} students
+                          {b.students.length} interns
                         </td>
                         <td className="py-3.5 pl-2 text-right text-zinc-650 dark:text-zinc-400">
                           {b.assignments.length} tasks

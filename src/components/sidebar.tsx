@@ -44,14 +44,14 @@ export default function Sidebar({ role, userName }: SidebarProps) {
       case "MENTOR":
         return [
           { name: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
-          { name: "Students", href: "/mentor/students", icon: Users },
+          { name: "Interns", href: "/mentor/students", icon: Users },
           { name: "Reviews", href: "/mentor/reviews", icon: CheckSquare },
           { name: "Meetings", href: "/mentor/meetings", icon: Calendar },
         ];
       case "ADMIN":
         return [
           { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-          { name: "Students", href: "/admin/students", icon: Users },
+          { name: "Interns", href: "/admin/students", icon: Users },
           { name: "Mentors", href: "/admin/mentors", icon: ShieldAlert },
           { name: "Programs", href: "/admin/programs", icon: Layers },
           { name: "Attendance", href: "/admin/attendance", icon: Activity },
@@ -75,7 +75,7 @@ export default function Sidebar({ role, userName }: SidebarProps) {
   return (
     <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-white border-r border-zinc-200/80 shadow-sm z-20">
       {/* Header / Brand */}
-      <div className="h-16 flex items-center px-6 border-b border-zinc-200/80 bg-zinc-50/50">
+      <div className="h-16 flex items-center px-6 border-b border-zinc-200/80 bg-zinc-55/50">
         <Link href="/" className="flex items-center gap-2">
           <img 
             src="/logo.png" 
@@ -84,7 +84,7 @@ export default function Sidebar({ role, userName }: SidebarProps) {
           />
           <div>
             <span className="font-semibold text-zinc-950 font-sans tracking-tight block leading-none">GAS Virtual Lab</span>
-            <span className="text-[10px] text-zinc-500 font-medium block mt-0.5 tracking-wider uppercase">{role} PORTAL</span>
+            <span className="text-[10px] text-zinc-550 font-medium block mt-0.5 tracking-wider uppercase">{role === "STUDENT" ? "INTERN" : role} PORTAL</span>
           </div>
         </Link>
       </div>
@@ -102,10 +102,10 @@ export default function Sidebar({ role, userName }: SidebarProps) {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive 
                   ? "bg-blue-50 text-blue-600 shadow-sm" 
-                  : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50"
+                  : "text-zinc-650 hover:text-zinc-950 hover:bg-zinc-50"
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-zinc-400 group-hover:text-zinc-600"}`} />
+              <Icon className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-zinc-400 group-hover:text-zinc-605"}`} />
               <span>{link.name}</span>
             </Link>
           );
@@ -121,7 +121,7 @@ export default function Sidebar({ role, userName }: SidebarProps) {
             </div>
             <div className="overflow-hidden">
               <span className="font-medium text-sm text-zinc-900 block truncate leading-tight">{userName}</span>
-              <span className="text-xs text-zinc-500 block truncate lowercase">{role}</span>
+              <span className="text-xs text-zinc-500 block truncate lowercase">{role === "STUDENT" ? "intern" : role.toLowerCase()}</span>
             </div>
           </div>
         </div>

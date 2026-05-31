@@ -59,9 +59,9 @@ export default async function StudentDashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm">
         <AlertCircle className="w-12 h-12 text-amber-500 mb-4" />
-        <h2 className="text-xl font-bold text-zinc-950">Student Profile Incomplete</h2>
+        <h2 className="text-xl font-bold text-zinc-950">Intern Profile Incomplete</h2>
         <p className="text-zinc-500 text-sm mt-2 max-w-sm">
-          Your account is registered, but your student enrollment file is missing. Please contact platform administration.
+          Your account is registered, but your intern enrollment file is missing. Please contact platform administration.
         </p>
       </div>
     );
@@ -98,7 +98,7 @@ export default async function StudentDashboardPage() {
         <div className="relative space-y-4">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs font-semibold">
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Fellowship Workspace</span>
+            <span>Internship Workspace</span>
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">

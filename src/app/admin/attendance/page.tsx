@@ -30,9 +30,9 @@ export default async function AdminAttendancePage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Attendance Registry</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-955 dark:text-white">Attendance Registry</h1>
         <p className="text-xs sm:text-sm text-zinc-555 dark:text-zinc-400 mt-1">
-          Review recent student engagement indices, check-in timestamps, and activity logs across all cohort batches.
+          Review recent intern engagement indices, check-in timestamps, and activity logs across all cohort batches.
         </p>
       </div>
 
@@ -40,7 +40,7 @@ export default async function AdminAttendancePage() {
         <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 shadow-sm">
           <Activity className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mb-3 animate-pulse" />
           <h3 className="text-base font-bold text-zinc-950 dark:text-white">No Engagement Audits</h3>
-          <p className="text-zinc-500 text-xs sm:text-sm mt-1 max-w-sm">
+          <p className="text-zinc-550 text-xs sm:text-sm mt-1 max-w-sm">
             Engagement audits have not started yet. Logs are generated during cohort lecture check-ins.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default async function AdminAttendancePage() {
               <thead>
                 <tr className="border-b border-zinc-150 dark:border-zinc-800 text-[10px] uppercase font-bold text-zinc-400 tracking-wider bg-zinc-50/50 dark:bg-zinc-800/20">
                   <th className="py-4 px-6">Evaluation Date</th>
-                  <th className="py-4 px-4">Student</th>
+                  <th className="py-4 px-4">Intern</th>
                   <th className="py-4 px-4">Daily Engagement</th>
                   <th className="py-4 px-6 text-right">Status</th>
                 </tr>

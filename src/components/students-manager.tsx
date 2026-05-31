@@ -256,7 +256,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-3.5" />
           <input
             type="text"
-            placeholder="Search students registry..."
+            placeholder="Search interns registry..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 bg-zinc-55/40 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
@@ -271,7 +271,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
           className="w-full sm:w-auto px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/10 flex items-center justify-center gap-1.5"
         >
           <Plus className="w-4 h-4" />
-          <span>{showAddForm ? "Close Form" : "Enroll Fellow"}</span>
+          <span>{showAddForm ? "Close Form" : "Enroll Intern"}</span>
         </button>
       </div>
 
@@ -279,7 +279,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
       {showAddForm && (
         <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 p-6 sm:p-8 shadow-md space-y-6 animate-scale-in">
           <h3 className="font-bold text-zinc-950 dark:text-white text-sm uppercase tracking-wider">
-            Enroll New Fellow
+            Enroll New Intern
           </h3>
 
           {message && (
@@ -396,7 +396,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                   <span>Enrolling...</span>
                 </>
               ) : (
-                <span>Enroll Fellow & Create Student Record</span>
+                <span>Enroll Intern & Create Intern Record</span>
               )}
             </button>
           </form>
@@ -410,10 +410,10 @@ export default function StudentsManager({ students: initialStudents, batches, pr
           className={`px-4 py-2 font-bold transition-all rounded-lg border ${
             filterTab === "ALL"
               ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-950/40 shadow-sm"
-              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-350 border-transparent"
+              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-355 border-transparent"
           }`}
         >
-          All Fellows ({students.length})
+          All Interns ({students.length})
         </button>
         <button
           onClick={() => setFilterTab("ELIGIBLE")}
@@ -540,7 +540,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                         setShowEditModal(true);
                       }}
                       className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-all inline-flex"
-                      title="Edit Student Profile"
+                      title="Edit Intern Profile"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -584,9 +584,9 @@ export default function StudentsManager({ students: initialStudents, batches, pr
           
           <div className="relative bg-white dark:bg-zinc-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 z-50 animate-scale-in space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-zinc-950 dark:text-white text-sm uppercase tracking-wider flex items-center gap-2">
+              <h3 className="font-bold text-zinc-955 dark:text-white text-sm uppercase tracking-wider flex items-center gap-2">
                 <Edit2 className="w-5 h-5 text-blue-600" />
-                Modify Student Profile
+                Modify Intern Profile
               </h3>
               <button onClick={() => { setShowEditModal(false); setSelectedStudentForEdit(null); }} className="p-1 rounded-lg text-zinc-450 hover:bg-zinc-100 transition-colors">
                 <X className="w-5 h-5" />
@@ -712,7 +712,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <span>Update Student Profile</span>
+                  <span>Update Intern Profile</span>
                 )}
               </button>
             </form>
@@ -731,11 +731,11 @@ export default function StudentsManager({ students: initialStudents, batches, pr
             </div>
 
             <div className="space-y-2">
-              <h3 className="font-extrabold text-zinc-950 dark:text-white text-base">
-                Delete Fellow Account
+              <h3 className="font-extrabold text-zinc-955 dark:text-white text-base">
+                Delete Intern Account
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-450 leading-relaxed">
-                Are you sure you want to permanently delete the profile of <span className="font-bold text-zinc-800 dark:text-zinc-200">{selectedStudentForDelete.user.name}</span>? This action deletes all records and cannot be undone.
+                Are you sure you want to permanently delete the profile of <span className="font-bold text-zinc-850 dark:text-zinc-200">{selectedStudentForDelete.user.name}</span>? This action deletes all records and cannot be undone.
               </p>
             </div>
 
@@ -789,8 +789,8 @@ export default function StudentsManager({ students: initialStudents, batches, pr
             </div>
 
             <div className="p-4 bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60 rounded-2xl text-xs space-y-1">
-              <span className="text-zinc-555">Student: <span className="font-bold text-zinc-900 dark:text-white">{selectedStudentForCert.user.name}</span></span>
-              <span className="block text-zinc-555">Program: <span className="font-semibold text-zinc-805 dark:text-zinc-350">{selectedStudentForCert.program?.title}</span></span>
+              <span className="text-zinc-555">Intern: <span className="font-bold text-zinc-900 dark:text-white">{selectedStudentForCert.user.name}</span></span>
+              <span className="block text-zinc-555">Program: <span className="font-semibold text-zinc-800 dark:text-zinc-350">{selectedStudentForCert.program?.title}</span></span>
             </div>
 
             {message && (

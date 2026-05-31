@@ -174,14 +174,14 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-3.5" />
           <input
             type="text"
-            placeholder="Search mentees registry..."
+            placeholder="Search interns registry..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 bg-zinc-55/40 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
           />
         </div>
         <span className="text-xs font-semibold text-zinc-400">
-          {filteredStudents.length} mentees enrolled
+          {filteredStudents.length} interns enrolled
         </span>
       </div>
 
@@ -335,7 +335,7 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
 
                       {/* Issue Certificate button — available even if not "ready" (manual override by mentor) */}
                       {!selectedStudent.program ? (
-                        <p className="text-[10px] text-amber-600 italic">Student has no program assigned. Cannot issue certificate.</p>
+                        <p className="text-[10px] text-amber-600 italic">Intern has no program assigned. Cannot issue certificate.</p>
                       ) : (
                         <button
                           type="button"
@@ -436,7 +436,7 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
 
               {selectedStudent.projects.length === 0 ? (
                 <div className="p-6 bg-zinc-55/20 dark:bg-zinc-800/20 border border-zinc-100 dark:border-zinc-800/40 rounded-2xl text-center text-xs text-zinc-400 italic">
-                  No active projects assigned to this student.
+                  No active projects assigned to this intern.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -501,7 +501,7 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
 
             {/* Student summary */}
             <div className="p-4 bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/60 rounded-2xl text-xs space-y-1">
-              <span className="text-zinc-500">Student: <span className="font-bold text-zinc-900 dark:text-white">{selectedStudent.user.name}</span></span>
+              <span className="text-zinc-500">Intern: <span className="font-bold text-zinc-900 dark:text-white">{selectedStudent.user.name}</span></span>
               <span className="block text-zinc-500">Program: <span className="font-semibold text-zinc-800 dark:text-zinc-300">{selectedStudent.program?.title || "N/A"}</span></span>
               <span className="block text-zinc-500">Matric No: <span className="font-mono font-bold text-zinc-900 dark:text-white">{selectedStudent.matricNumber || "N/A"}</span></span>
             </div>
@@ -519,7 +519,7 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
                   <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl text-xs text-amber-700 dark:text-amber-400">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                      <strong>Manual Override:</strong> This student has not yet met all automatic graduation criteria
+                      <strong>Manual Override:</strong> This intern has not yet met all automatic graduation criteria
                       {avgAtt < 75 ? ` (Attendance: ${avgAtt}% < 75%)` : ""}
                       {!hasProj ? " (No approved project with drive link)" : ""}.
                       You can still issue the certificate as a mentor override.

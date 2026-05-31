@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 interface ChartDataPoint {
   name: string;
-  students: number;
+  interns: number;
 }
 
 interface AdminChartsProps {
@@ -56,7 +56,7 @@ export default function AdminCharts({ data }: AdminChartsProps) {
               fontSize: "11px"
             }}
           />
-          <Bar dataKey="students" radius={[8, 8, 0, 0]}>
+          <Bar dataKey="interns" radius={[8, 8, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}

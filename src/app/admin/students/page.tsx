@@ -38,9 +38,9 @@ export default async function AdminStudentsPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Fellows Console</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white">Interns Console</h1>
         <p className="text-xs sm:text-sm text-zinc-550 dark:text-zinc-400 mt-1">
-          Add new fellows, manage cohort divisions, and release official verified corporate graduation certificates.
+          Add new interns, manage cohort divisions, and release official verified corporate graduation certificates.
         </p>
       </div>
 
