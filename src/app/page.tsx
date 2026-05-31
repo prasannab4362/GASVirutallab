@@ -35,6 +35,69 @@ const MARQUEE_ITEMS = [
   "RAG Pipelines", "Full-Stack Web", "Computer Vision",
 ];
 
+const ACTIVE_FELLOWSHIPS = [
+  {
+    cohort: "Cohort A — Live",
+    title: "Advanced AI & Deep Learning Fellowship",
+    duration: "6 Months",
+    timeline: "Ongoing",
+    description: "Deep dive into convolutional architectures, implement custom attention layers, train transformers from scratch, and deploy RAG systems locally.",
+    bullets: [
+      "PyTorch & Custom Neural Networks",
+      "Attention Mechanism & Transformer Architectures",
+      "FAISS, LangChain & Hybrid Search RAGs",
+      "Production Deployment & Latency Optimization",
+      "1-on-1 Direct Industry Mentor Syncs",
+      "Verified Corporate Graduation Certificate",
+    ]
+  },
+  {
+    cohort: "Cohort B — Live",
+    title: "Smart Automation & IoT Systems Fellowship",
+    duration: "6 Months",
+    timeline: "Ongoing",
+    description: "Design and implement industrial-grade automation platforms, wireless sensor networks, telemetry pipelines, and real-time remote monitoring systems.",
+    bullets: [
+      "ESP32 & Raspberry Pi System Designs",
+      "MQTT, Modbus & WebSocket Protocols",
+      "Sensors & Actuators Hardware Calibration",
+      "Node-RED & Custom Telemetry Dashboards",
+      "Real-Time Edge Analytics Pipelines",
+      "Verified Corporate Graduation Certificate",
+    ]
+  },
+  {
+    cohort: "Cohort C — Live",
+    title: "Robotics & Embedded Systems Fellowship",
+    duration: "6 Months",
+    timeline: "Ongoing",
+    description: "Deep dive into microcontroller architectures, register-level configuration, hardware protocols, firmware optimization, and robotic kinetic controls using Embedded C and Arduino.",
+    bullets: [
+      "Embedded C & C++ Firmware Engineering",
+      "AVR/ARM Architectures & Register Access",
+      "I2C, SPI & UART Communication Protocols",
+      "Motor Kinematics & PID Feedback Loops",
+      "Hardware Debugging & Logic Analyzers",
+      "Verified Corporate Graduation Certificate",
+    ]
+  },
+  {
+    cohort: "Cohort D — Live",
+    title: "Full-Stack Web Development & Web AI Fellowship",
+    duration: "6 Months",
+    timeline: "Ongoing",
+    description: "Construct production-grade, highly responsive web systems integrated with agentic AI models, real-time sync databases, and modern cloud deployment pipelines.",
+    bullets: [
+      "Next.js, React & TailwindCSS Frontends",
+      "Node.js Backend & SQLite/Postgres DBs",
+      "AI API Integrations (OpenAI, Anthropic, Gemini)",
+      "WebSocket Real-Time Sync Engines",
+      "Docker Containerization & Vercel/VPS Deploy",
+      "Verified Corporate Graduation Certificate",
+    ]
+  }
+];
+
 export default function LandingPage() {
   const [certNumber,  setCertNumber]  = useState("");
   const [verResult,   setVerResult]   = useState<any>(null);
@@ -319,7 +382,7 @@ export default function LandingPage() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-100/30 rounded-full blur-[120px] -z-10 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-emerald-100/40 rounded-full blur-[100px] -z-10 pointer-events-none" />
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 reveal-on-scroll">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold mb-4">
               <BookOpen className="w-3.5 h-3.5" /> Lab Programs
@@ -330,55 +393,59 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="relative group reveal-on-scroll stagger-2">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-emerald-500/40 via-violet-500/20 to-blue-500/30 opacity-0 group-hover:opacity-100 blur-sm transition-all duration-500" />
-            <div className="relative bg-white rounded-3xl border border-zinc-200/80 p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-zinc-100">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Cohort A — Live
-                  </span>
-                  <h3 className="text-xl font-black text-zinc-950 mt-3">Advanced AI and Deep Learning Fellowship</h3>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <span className="flex items-center gap-1.5 text-xs text-zinc-500 bg-zinc-50 px-3 py-1.5 rounded-full border border-zinc-100">
-                    <Clock className="w-3 h-3 text-emerald-600" /> 6 Months
-                  </span>
-                  <span className="flex items-center gap-1.5 text-xs text-zinc-500 bg-zinc-50 px-3 py-1.5 rounded-full border border-zinc-100">
-                    <Calendar className="w-3 h-3 text-violet-500" /> Ongoing
-                  </span>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            {ACTIVE_FELLOWSHIPS.map((f, idx) => (
+              <div key={idx} className="relative group reveal-on-scroll">
+                <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-emerald-500/40 via-violet-500/20 to-blue-500/30 opacity-0 group-hover:opacity-100 blur-sm transition-all duration-500" />
+                <div className="relative bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-8 shadow-md hover:shadow-xl transition-all flex flex-col justify-between h-full">
+                  <div>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-5 border-b border-zinc-100">
+                      <div>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          {f.cohort}
+                        </span>
+                        <h3 className="text-lg font-black text-zinc-950 mt-2.5 leading-snug">{f.title}</h3>
+                      </div>
+                      <div className="flex gap-1.5 shrink-0">
+                        <span className="flex items-center gap-1 text-[10px] text-zinc-500 bg-zinc-50 px-2.5 py-1 rounded-full border border-zinc-100 font-semibold">
+                          <Clock className="w-3 h-3 text-emerald-600" /> {f.duration}
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] text-zinc-500 bg-zinc-50 px-2.5 py-1 rounded-full border border-zinc-100 font-semibold">
+                          <Calendar className="w-3 h-3 text-violet-500" /> {f.timeline}
+                        </span>
+                      </div>
+                    </div>
 
-              <p className="text-sm text-zinc-600 mt-6 leading-relaxed">
-                A comprehensive, project-driven R&D fellowship. Deep dive into convolutional architectures, implement custom attention layers, train transformers from scratch, and deploy RAG systems locally.
-              </p>
+                    <p className="text-xs sm:text-sm text-zinc-600 mt-5 leading-relaxed">
+                      {f.description}
+                    </p>
 
-              <div className="mt-7 grid sm:grid-cols-2 gap-3">
-                {[
-                  "PyTorch & Custom Neural Networks",
-                  "Attention Mechanism & Transformer Architectures",
-                  "FAISS, LangChain & Hybrid Search RAGs",
-                  "Production Deployment & Latency Optimization",
-                  "1-on-1 Direct Industry Mentor Syncs",
-                  "Verified Corporate Graduation Certificate",
-                ].map((item) => (
-                  <div key={item} className="flex items-start gap-2.5 p-3 rounded-xl bg-zinc-50 border border-zinc-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-zinc-700 text-sm">{item}</span>
+                    <div className="mt-6 grid grid-cols-1 gap-2 border-t border-zinc-50 pt-5">
+                      {f.bullets.map((item) => (
+                        <div key={item} className="flex items-start gap-2 p-2 rounded-lg hover:bg-emerald-50/20 transition-all">
+                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                          <span className="text-zinc-700 text-xs">{item}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              <div className="mt-8">
-                <Link href="/login" className="relative inline-flex items-center gap-2 px-6 py-3 text-sm font-bold rounded-2xl text-white overflow-hidden group shadow-lg shadow-emerald-500/20 hover:shadow-xl transition-shadow">
-                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-all" />
-                  <span className="absolute inset-0 beam-sweep" />
-                  <span className="relative flex items-center gap-2">Apply for Fellowship <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" /></span>
-                </Link>
+                  <div className="mt-8 pt-4 border-t border-zinc-50/80">
+                    <a 
+                      href="https://docs.google.com/forms/d/e/1FAIpQLSe0q_g9lVSP3yYwcSws2NJukx80_xGePg56DuJzZ_8T2R-OMA/viewform?pli=1"
+                      target="_blank"
+                      rel="noopener noreferrer" 
+                      className="relative inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold rounded-xl text-white overflow-hidden group shadow-md shadow-emerald-500/10 hover:shadow-lg transition-shadow w-full justify-center"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-all" />
+                      <span className="absolute inset-0 beam-sweep" />
+                      <span className="relative flex items-center gap-1.5">Apply for Fellowship <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" /></span>
+                    </a>
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
