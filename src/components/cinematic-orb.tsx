@@ -2,6 +2,20 @@
 
 import { useEffect, useRef } from "react";
 
+// Domain color palette mapped to GAS's 6 disciplines
+const DOMAIN_COLORS = [
+  { h: 160, s: 80, l: 50, name: "AI / ML"        },  // emerald-green
+  { h: 210, s: 85, l: 55, name: "IoT"             },  // blue
+  { h: 262, s: 80, l: 60, name: "Robotics"        },  // violet
+  { h:  38, s: 90, l: 52, name: "Arduino/Embedded" }, // amber
+  { h: 335, s: 80, l: 60, name: "Web Dev"         },  // pink
+  { h: 188, s: 85, l: 45, name: "Automation"      },  // cyan
+];
+
+function hsl(h: number, s: number, l: number, a = 1) {
+  return `hsla(${h},${s}%,${l}%,${a})`;
+}
+
 export default function CinematicOrb() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -21,133 +35,141 @@ export default function CinematicOrb() {
     window.addEventListener("resize", resize);
     resize();
 
-    // Orbit ring data
-    const rings = [
-      { rx: 1.00, ry: 0.30, speed: 0.007, phase: 0,           color: "rgba(16,185,129," },
-      { rx: 0.90, ry: 0.40, speed: -0.009, phase: Math.PI / 3, color: "rgba(139,92,246," },
-      { rx: 0.80, ry: 0.25, speed: 0.011, phase: Math.PI,      color: "rgba(59,130,246," },
-    ];
-
-    // Floating data nodes
-    interface Node { angle: number; dist: number; speed: number; size: number; color: string; trail: {x:number,y:number}[] }
-    const nodes: Node[] = Array.from({ length: 14 }, (_, i) => ({
-      angle: (i / 14) * Math.PI * 2,
-      dist:  120 + (i % 4) * 28,
-      speed: (i % 2 === 0 ? 1 : -1) * (0.006 + i * 0.0012),
-      size:  2 + (i % 3),
-      color: ["rgba(16,185,129,","rgba(139,92,246,","rgba(59,130,246,"][i % 3],
-      trail: [],
+    // ── 6 orbit rings — one per domain ──
+    type Ring = { speed: number; phase: number; tilt: number; domain: typeof DOMAIN_COLORS[0] };
+    const rings: Ring[] = DOMAIN_COLORS.map((domain, i) => ({
+      speed:  (i % 2 === 0 ? 1 : -1) * (0.006 + i * 0.0015),
+      phase:  (i / 6) * Math.PI * 2,
+      tilt:   0.15 + i * 0.09,
+      domain,
     }));
 
-    // Energy pulse rings (burst outward from center)
-    const pulses: { r: number; alpha: number; speed: number; color: string }[] = [];
+    // ── 18 floating data nodes ──
+    type Node = { angle: number; dist: number; speed: number; size: number; domain: typeof DOMAIN_COLORS[0]; trail: {x:number;y:number}[] };
+    const nodes: Node[] = Array.from({ length: 18 }, (_, i) => ({
+      angle:  (i / 18) * Math.PI * 2,
+      dist:   100 + (i % 5) * 26,
+      speed:  (i % 2 === 0 ? 1 : -1) * (0.005 + i * 0.001),
+      size:   1.5 + (i % 4) * 0.6,
+      domain: DOMAIN_COLORS[i % DOMAIN_COLORS.length],
+      trail:  [],
+    }));
+
+    // ── Energy pulses ──
+    const pulses: { r: number; alpha: number; speed: number; domain: typeof DOMAIN_COLORS[0] }[] = [];
     let pulseTimer = 0;
+    let pulseDomainIdx = 0;
+
+    // ── Domain label text flash ──
+    let labelTimer = 0;
+    let currentLabel = DOMAIN_COLORS[0];
+    let labelAlpha = 0;
 
     const draw = () => {
       t += 0.016;
-      pulseTimer += 1;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pulseTimer++;
+      labelTimer++;
 
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       const cx = canvas.width  / 2;
       const cy = canvas.height / 2;
-      const baseR = Math.min(canvas.width, canvas.height) * 0.22;
+      const baseR = Math.min(canvas.width, canvas.height) * 0.21;
 
-      // ── Spawn energy pulses ──
-      if (pulseTimer % 80 === 0) {
-        pulses.push({
-          r: baseR * 0.4,
-          alpha: 0.5,
-          speed: 1.8,
-          color: ["rgba(16,185,129,","rgba(139,92,246,","rgba(59,130,246,"][Math.floor(Math.random() * 3)],
-        });
+      // ── Spawn pulse every ~2.5s, cycling through domains ──
+      if (pulseTimer % 95 === 0) {
+        const dom = DOMAIN_COLORS[pulseDomainIdx % DOMAIN_COLORS.length];
+        pulses.push({ r: baseR * 0.45, alpha: 0.55, speed: 1.7, domain: dom });
+        if (pulseTimer % 285 === 0) {
+          currentLabel = dom;
+          labelAlpha = 1;
+        }
+        pulseDomainIdx++;
       }
+      if (labelAlpha > 0) labelAlpha -= 0.012;
 
-      // ── Draw & update pulses ──
-      pulses.forEach((p, i) => {
+      // ── Update & draw pulses ──
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i];
         p.r += p.speed;
-        p.alpha *= 0.97;
+        p.alpha *= 0.971;
         ctx.beginPath();
         ctx.arc(cx, cy, p.r, 0, Math.PI * 2);
-        ctx.strokeStyle = p.color + p.alpha + ")";
+        ctx.strokeStyle = hsl(p.domain.h, p.domain.s, p.domain.l, p.alpha);
         ctx.lineWidth = 1.5;
         ctx.stroke();
         if (p.alpha < 0.01 || p.r > baseR * 3.5) pulses.splice(i, 1);
-      });
+      }
 
-      // ── Core orb — multi-layer glow ──
-      const glowSizes = [2.2, 1.6, 1.2, 0.9, 0.6, 0.35];
-      const glowOpacities = [0.04, 0.07, 0.10, 0.18, 0.32, 0.55];
-      glowSizes.forEach((mul, i) => {
+      // ── Multi-layer glow halos (each shifts hue gently) ──
+      const haloSizes = [2.4, 1.8, 1.35, 1.0, 0.7, 0.42];
+      const haloAlphas = [0.035, 0.06, 0.09, 0.16, 0.30, 0.50];
+      haloSizes.forEach((mul, i) => {
+        const hueShift = Math.sin(t * 0.3 + i) * 40;   // smoothly cycles hue
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * mul);
-        const wobble = Math.sin(t * 1.1 + i) * 0.03;
-        g.addColorStop(0, `rgba(16,185,129,${glowOpacities[i] + wobble})`);
-        g.addColorStop(0.5, `rgba(139,92,246,${glowOpacities[i] * 0.6})`);
-        g.addColorStop(1, "rgba(0,0,0,0)");
+        g.addColorStop(0,   hsl(160 + hueShift, 75, 55, haloAlphas[i]));
+        g.addColorStop(0.45,hsl(262 + hueShift, 70, 55, haloAlphas[i] * 0.5));
+        g.addColorStop(1,   "rgba(0,0,0,0)");
         ctx.beginPath();
         ctx.arc(cx, cy, baseR * mul, 0, Math.PI * 2);
         ctx.fillStyle = g;
         ctx.fill();
       });
 
-      // ── Inner orb solid ──
-      const morphR = baseR * 0.38 + Math.sin(t * 0.8) * baseR * 0.04;
-      const innerGrad = ctx.createRadialGradient(cx - morphR * 0.2, cy - morphR * 0.2, 0, cx, cy, morphR);
-      innerGrad.addColorStop(0, "rgba(255,255,255,0.25)");
-      innerGrad.addColorStop(0.4, "rgba(16,185,129,0.55)");
-      innerGrad.addColorStop(0.75, "rgba(5,150,105,0.70)");
-      innerGrad.addColorStop(1, "rgba(4,120,87,0.85)");
+      // ── Core orb solid (hue-cycles through domain colors) ──
+      const morphR  = baseR * 0.38 + Math.sin(t * 0.8) * baseR * 0.035;
+      const coreHue = ((t * 8) % 360);   // slowly cycles all hues
+      const ig = ctx.createRadialGradient(cx - morphR * 0.22, cy - morphR * 0.22, 0, cx, cy, morphR);
+      ig.addColorStop(0,    "rgba(255,255,255,0.22)");
+      ig.addColorStop(0.35, hsl(coreHue,        80, 55, 0.60));
+      ig.addColorStop(0.72, hsl(coreHue + 30,   75, 42, 0.75));
+      ig.addColorStop(1,    hsl(coreHue + 55,   70, 32, 0.90));
       ctx.beginPath();
       ctx.arc(cx, cy, morphR, 0, Math.PI * 2);
-      ctx.fillStyle = innerGrad;
+      ctx.fillStyle = ig;
       ctx.fill();
 
       // Specular highlight
-      const specX = cx - morphR * 0.28;
-      const specY = cy - morphR * 0.28;
-      const specG = ctx.createRadialGradient(specX, specY, 0, specX, specY, morphR * 0.45);
-      specG.addColorStop(0, "rgba(255,255,255,0.35)");
-      specG.addColorStop(1, "rgba(255,255,255,0)");
+      const sg = ctx.createRadialGradient(cx - morphR * 0.3, cy - morphR * 0.3, 0, cx - morphR * 0.3, cy - morphR * 0.3, morphR * 0.5);
+      sg.addColorStop(0, "rgba(255,255,255,0.32)");
+      sg.addColorStop(1, "rgba(255,255,255,0)");
       ctx.beginPath();
       ctx.arc(cx, cy, morphR, 0, Math.PI * 2);
-      ctx.fillStyle = specG;
+      ctx.fillStyle = sg;
       ctx.fill();
 
-      // ── Orbit rings (ellipse illusion) ──
+      // ── 6 domain orbit rings ──
       rings.forEach(ring => {
         ring.phase += ring.speed;
-        const orbitR = baseR * 1.15;
+        const rx = baseR * 1.18;
+        const ry = rx * ring.tilt;
 
         ctx.save();
         ctx.translate(cx, cy);
-        ctx.scale(1, ring.ry);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, orbitR * ring.rx, orbitR * ring.rx, 0, 0, Math.PI * 2);
-        const gradient = ctx.createLinearGradient(-orbitR, 0, orbitR, 0);
-        gradient.addColorStop(0,   ring.color + "0)");
-        gradient.addColorStop(0.3, ring.color + "0.25)");
-        gradient.addColorStop(0.5, ring.color + "0.55)");
-        gradient.addColorStop(0.7, ring.color + "0.25)");
-        gradient.addColorStop(1,   ring.color + "0)");
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
 
-        // Dot on ring
-        const dotX = Math.cos(ring.phase) * orbitR * ring.rx;
-        const dotY = Math.sin(ring.phase) * orbitR * ring.rx * ring.ry;
+        // Ring path
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        const rg = ctx.createLinearGradient(-rx, 0, rx, 0);
+        rg.addColorStop(0,    hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0));
+        rg.addColorStop(0.3,  hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0.22));
+        rg.addColorStop(0.5,  hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0.55));
+        rg.addColorStop(0.7,  hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0.22));
+        rg.addColorStop(1,    hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0));
+        ctx.strokeStyle = rg;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
         ctx.restore();
 
-        // Convert back from scale(1, ry) coords
-        const rdx = Math.cos(ring.phase) * orbitR * ring.rx;
-        const rdy = Math.sin(ring.phase) * orbitR * ring.rx * ring.ry;
-
-        // Dot glow
-        const dg = ctx.createRadialGradient(cx + rdx, cy + rdy, 0, cx + rdx, cy + rdy, 8);
-        dg.addColorStop(0, ring.color + "1)");
-        dg.addColorStop(1, ring.color + "0)");
-        ctx.beginPath();
-        ctx.arc(cx + rdx, cy + rdy, 5, 0, Math.PI * 2);
-        ctx.fillStyle = dg;
+        // Moving dot on ring
+        const dotX = cx + Math.cos(ring.phase) * rx;
+        const dotY = cy + Math.sin(ring.phase) * ry;
+        const dg = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, 8);
+        dg.addColorStop(0, hsl(ring.domain.h, ring.domain.s, ring.domain.l, 1));
+        dg.addColorStop(1, hsl(ring.domain.h, ring.domain.s, ring.domain.l, 0));
+        ctx.beginPath(); ctx.arc(dotX, dotY, 7, 0, Math.PI * 2);
+        ctx.fillStyle = dg; ctx.fill();
+        ctx.beginPath(); ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = hsl(ring.domain.h, ring.domain.s, 90, 0.95);
         ctx.fill();
       });
 
@@ -155,57 +177,57 @@ export default function CinematicOrb() {
       nodes.forEach(node => {
         node.angle += node.speed;
         const nx = cx + Math.cos(node.angle) * node.dist;
-        const ny = cy + Math.sin(node.angle) * (node.dist * 0.55);
+        const ny = cy + Math.sin(node.angle) * (node.dist * 0.52);
 
         node.trail.push({ x: nx, y: ny });
-        if (node.trail.length > 10) node.trail.shift();
+        if (node.trail.length > 12) node.trail.shift();
 
         // Trail
         node.trail.forEach((pt, i) => {
-          const a = (i / node.trail.length) * 0.35;
+          const a = (i / node.trail.length) * 0.3;
           ctx.beginPath();
-          ctx.arc(pt.x, pt.y, node.size * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = node.color + a + ")";
+          ctx.arc(pt.x, pt.y, node.size * 0.55, 0, Math.PI * 2);
+          ctx.fillStyle = hsl(node.domain.h, node.domain.s, node.domain.l, a);
           ctx.fill();
         });
 
-        // Node
-        const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, node.size * 3);
-        ng.addColorStop(0, node.color + "0.9)");
-        ng.addColorStop(0.4, node.color + "0.4)");
-        ng.addColorStop(1, node.color + "0)");
-        ctx.beginPath();
-        ctx.arc(nx, ny, node.size * 3, 0, Math.PI * 2);
-        ctx.fillStyle = ng;
+        // Node glow
+        const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, node.size * 3.5);
+        ng.addColorStop(0, hsl(node.domain.h, node.domain.s, node.domain.l, 0.9));
+        ng.addColorStop(1, hsl(node.domain.h, node.domain.s, node.domain.l, 0));
+        ctx.beginPath(); ctx.arc(nx, ny, node.size * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = ng; ctx.fill();
+        ctx.beginPath(); ctx.arc(nx, ny, node.size, 0, Math.PI * 2);
+        ctx.fillStyle = hsl(node.domain.h, node.domain.s, 88, 1);
         ctx.fill();
 
-        ctx.beginPath();
-        ctx.arc(nx, ny, node.size, 0, Math.PI * 2);
-        ctx.fillStyle = node.color + "1)";
-        ctx.fill();
-
-        // Connecting line to core
-        const lineDist = Math.sqrt((nx - cx) ** 2 + (ny - cy) ** 2);
-        const la = Math.max(0, 1 - lineDist / (baseR * 1.5)) * 0.12;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(nx, ny);
-        ctx.strokeStyle = node.color + la + ")";
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
+        // Line to core
+        const lineDist = Math.hypot(nx - cx, ny - cy);
+        const la = Math.max(0, (1 - lineDist / (baseR * 1.5)) * 0.14);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny);
+        ctx.strokeStyle = hsl(node.domain.h, node.domain.s, node.domain.l, la);
+        ctx.lineWidth = 0.7; ctx.stroke();
       });
 
-      // ── Outer halo ring ──
-      const haloR = baseR * 1.55 + Math.sin(t * 0.6) * 6;
-      const haloGrad = ctx.createRadialGradient(cx, cy, haloR - 12, cx, cy, haloR + 12);
-      haloGrad.addColorStop(0, "rgba(16,185,129,0)");
-      haloGrad.addColorStop(0.5, `rgba(16,185,129,${0.06 + Math.sin(t) * 0.02})`);
-      haloGrad.addColorStop(1, "rgba(16,185,129,0)");
+      // ── Outer breathing halo ring ──
+      const haloR = baseR * 1.6 + Math.sin(t * 0.65) * 5;
       ctx.beginPath();
       ctx.arc(cx, cy, haloR, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(16,185,129,${0.12 + Math.sin(t * 0.9) * 0.05})`;
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = hsl(160 + Math.sin(t * 0.4) * 80, 70, 55, 0.12 + Math.sin(t * 0.9) * 0.04);
+      ctx.lineWidth = 0.8;
       ctx.stroke();
+
+      // ── Domain label (flashes on each pulse) ──
+      if (labelAlpha > 0.05) {
+        ctx.save();
+        ctx.globalAlpha = Math.min(labelAlpha, 0.9);
+        ctx.font = `bold ${Math.round(baseR * 0.22)}px system-ui, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = hsl(currentLabel.h, currentLabel.s, currentLabel.l, 1);
+        ctx.fillText(currentLabel.name, cx, cy);
+        ctx.restore();
+      }
 
       raf = requestAnimationFrame(draw);
     };
