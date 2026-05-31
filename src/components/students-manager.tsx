@@ -548,7 +548,11 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                       onClick={() => {
                         setSelectedStudentForCert(s);
                         setShowCertForm(true);
-                        setCertNumber(`GAS-2026-${s.user.name.split(" ")[0].toUpperCase()}`);
+                        const namePart = s.user.name.split(" ")[0].replace(/[^a-zA-Z]/g, "").toUpperCase();
+                        const matricSuffix = s.matricNumber 
+                          ? s.matricNumber.split("-").pop()?.toUpperCase() || "" 
+                          : s.id.substring(0, 4).toUpperCase();
+                        setCertNumber(`GAS-2026-${namePart}-${matricSuffix}`);
                       }}
                       className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-all inline-flex"
                       title="Release Certificate"

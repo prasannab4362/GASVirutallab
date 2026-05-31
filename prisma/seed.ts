@@ -249,9 +249,9 @@ async function main() {
     data: {
       studentId: student.id,
       programId: program.id,
-      certificateNumber: "GAS-2026-ALEX",
-      verificationUrl: "/verify?id=GAS-2026-ALEX",
-      qrCodeData: "GAS-2026-ALEX",
+      certificateNumber: "GAS-2026-ALEX-0089",
+      verificationUrl: "/verify?id=GAS-2026-ALEX-0089",
+      qrCodeData: "GAS-2026-ALEX-0089",
       issueDate: new Date("2026-05-15"),
       status: "VALID",
     },

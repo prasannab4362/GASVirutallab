@@ -77,9 +77,11 @@ export default function Sidebar({ role, userName }: SidebarProps) {
       {/* Header / Brand */}
       <div className="h-16 flex items-center px-6 border-b border-zinc-200/80 bg-zinc-50/50">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-            G
-          </div>
+          <img 
+            src="/logo.jpg" 
+            alt="Green Automation Solution Logo" 
+            className="w-8 h-8 rounded-lg object-contain bg-white border border-zinc-150 shadow-sm"
+          />
           <div>
             <span className="font-semibold text-zinc-950 font-sans tracking-tight block leading-none">GAS Virtual Lab</span>
             <span className="text-[10px] text-zinc-500 font-medium block mt-0.5 tracking-wider uppercase">{role} PORTAL</span>

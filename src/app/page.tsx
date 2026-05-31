@@ -41,7 +41,7 @@ export default function LandingPage() {
 
   const faqs = [
     { q: "What is the GAS Virtual AI Lab?", a: "We provide an immersive, cohort-based learning platform where students execute real-world machine learning and deep learning projects under the direct guidance of industry mentors." },
-    { q: "How does the certificate verification work?", a: "Every graduate receives a unique certificate number (e.g. GAS-2026-ALEX). You can input this code directly on our homepage to instantly verify the certificate's validity and see the student's program details." },
+    { q: "How does the certificate verification work?", a: "Every graduate receives a unique certificate number (e.g. GAS-2026-ALEX-0089). You can input this code directly on our homepage to instantly verify the certificate's validity and see the student's program details." },
     { q: "Who are the mentors?", a: "Our mentors are seasoned practitioners, PhDs, and engineers working on production AI systems in top technology firms and research labs." }
   ];
 
@@ -51,9 +51,11 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="h-16 bg-white/70 backdrop-blur-md sticky top-0 border-b border-zinc-200/60 flex items-center justify-between px-6 sm:px-12 z-30">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-            G
-          </div>
+          <img 
+            src="/logo.jpg" 
+            alt="Green Automation Solution Logo" 
+            className="w-8 h-8 rounded-lg object-contain bg-white border border-zinc-150 shadow-sm"
+          />
           <span className="font-bold text-zinc-950 tracking-tight text-lg">GAS Virtual Lab</span>
         </Link>
         
@@ -128,7 +130,7 @@ export default function LandingPage() {
                 type="text"
                 required
                 suppressHydrationWarning
-                placeholder="Enter certificate number (e.g. GAS-2026-ALEX)"
+                placeholder="Enter certificate number (e.g. GAS-2026-ALEX-0089)"
                 value={certNumber}
                 onChange={(e) => setCertNumber(e.target.value)}
                 className="w-full pl-11 pr-4 py-3.5 bg-zinc-800 border border-zinc-700/80 rounded-2xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-600/40 focus:border-blue-500 text-sm transition-all"

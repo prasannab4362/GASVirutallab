@@ -115,7 +115,14 @@ export default function Navbar({ role, userName, notifications }: NavbarProps) {
           {/* Side Drawer menu */}
           <div className="relative flex flex-col w-72 max-w-xs h-full bg-white shadow-xl animate-slide-right py-4 z-40">
             <div className="flex items-center justify-between px-4 pb-4 border-b border-zinc-200/80">
-              <span className="font-bold text-zinc-950 text-sm">GAS Virtual Lab</span>
+              <div className="flex items-center gap-1.5">
+                <img 
+                  src="/logo.jpg" 
+                  alt="Green Automation Solution Logo" 
+                  className="w-6 h-6 rounded-md object-contain bg-white border border-zinc-150 shadow-sm"
+                />
+                <span className="font-bold text-zinc-950 text-xs">GAS Virtual Lab</span>
+              </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-1.5 rounded-lg text-zinc-500 hover:bg-zinc-100 transition-colors"

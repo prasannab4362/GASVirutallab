@@ -16,9 +16,11 @@ export default async function VerifyPage({
       {/* Header */}
       <header className="h-16 bg-white border-b border-zinc-200/60 flex items-center justify-between px-6 sm:px-12">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-            G
-          </div>
+          <img 
+            src="/logo.jpg" 
+            alt="Green Automation Solution Logo" 
+            className="w-8 h-8 rounded-lg object-contain bg-white border border-zinc-150 shadow-sm"
+          />
           <span className="font-bold text-zinc-950 tracking-tight text-lg">GAS Virtual Lab</span>
         </Link>
         <Link 
