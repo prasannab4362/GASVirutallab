@@ -3,12 +3,10 @@
 import { useEffect, useRef } from "react";
 
 interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  baseRadius: number;
+  x: number; y: number;
+  vx: number; vy: number;
+  radius: number; baseRadius: number;
+  hue: number; // 150=green, 260=violet, 220=blue
 }
 
 export default function NeuralCanvas() {
@@ -18,167 +16,117 @@ export default function NeuralCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let raf: number;
     let particles: Particle[] = [];
-    const maxParticles = 65;
-    const connectionDistance = 110;
-    const mouseConnectionDistance = 180;
+    const MAX = 90;
+    const CONNECT_DIST = 120;
+    const MOUSE_DIST   = 200;
 
-    const resizeCanvas = () => {
-      if (!canvas) return;
-      canvas.width = canvas.offsetWidth;
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      initParticles();
+      init();
     };
 
-    const initParticles = () => {
-      if (!canvas) return;
-      particles = [];
-      const width = canvas.width;
-      const height = canvas.height;
+    const hues = [152, 152, 260, 220]; // mostly green, some violet/blue
 
-      for (let i = 0; i < maxParticles; i++) {
-        const radius = Math.random() * 2 + 1;
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: radius,
-          baseRadius: radius,
-        });
-      }
+    const init = () => {
+      particles = Array.from({ length: MAX }, () => {
+        const r = Math.random() * 2 + 1;
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          radius: r, baseRadius: r,
+          hue: hues[Math.floor(Math.random() * hues.length)],
+        };
+      });
     };
 
     const draw = () => {
-      if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const m = mouseRef.current;
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const mouse = mouseRef.current;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width)  { p.vx *= -1; p.x = Math.max(0, Math.min(canvas.width,  p.x)); }
+        if (p.y < 0 || p.y > canvas.height)  { p.vy *= -1; p.y = Math.max(0, Math.min(canvas.height, p.y)); }
 
-      // Update and draw particles
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
+        if (m.active) {
+          const dx = m.x - p.x, dy = m.y - p.y;
+          const d = Math.hypot(dx, dy);
+          if (d < MOUSE_DIST) {
+            const f = (MOUSE_DIST - d) / MOUSE_DIST;
+            p.x += (dx / d) * f * 0.5;
+            p.y += (dy / d) * f * 0.5;
+            p.radius = p.baseRadius * (1 + f * 1.5);
+          } else { p.radius = p.baseRadius; }
+        } else { p.radius = p.baseRadius; }
 
-        // Bounce boundaries
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        // Keep inside boundaries
-        if (p.x < 0) p.x = 0;
-        if (p.x > width) p.x = width;
-        if (p.y < 0) p.y = 0;
-        if (p.y > height) p.y = height;
-
-        // Mouse interaction (gravity/pull)
-        if (mouse.active) {
-          const dx = mouse.x - p.x;
-          const dy = mouse.y - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < mouseConnectionDistance) {
-            // Softly pull toward mouse
-            const force = (mouseConnectionDistance - dist) / mouseConnectionDistance;
-            p.x += (dx / dist) * force * 0.4;
-            p.y += (dy / dist) * force * 0.4;
-            p.radius = p.baseRadius * (1 + force * 1.2);
-          } else {
-            p.radius = p.baseRadius;
-          }
-        } else {
-          p.radius = p.baseRadius;
-        }
-
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = mouse.active && Math.sqrt((mouse.x - p.x)**2 + (mouse.y - p.y)**2) < mouseConnectionDistance
-          ? "rgba(16, 185, 129, 0.4)"
-          : "rgba(16, 185, 129, 0.2)";
+        ctx.fillStyle = `hsla(${p.hue},80%,60%,0.35)`;
         ctx.fill();
       });
 
-      // Draw connection lines
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < connectionDistance) {
-            const alpha = (1 - dist / connectionDistance) * 0.15;
+          const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (d < CONNECT_DIST) {
+            const a = (1 - d / CONNECT_DIST) * 0.18;
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `hsla(${p1.hue},70%,55%,${a})`;
+            ctx.lineWidth = 0.7;
             ctx.stroke();
           }
         }
-
-        // Draw line to mouse
-        if (mouse.active) {
-          const dx = mouse.x - p1.x;
-          const dy = mouse.y - p1.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < mouseConnectionDistance) {
-            const alpha = (1 - dist / mouseConnectionDistance) * 0.25;
+        if (m.active) {
+          const d = Math.hypot(m.x - p1.x, m.y - p1.y);
+          if (d < MOUSE_DIST) {
+            const a = (1 - d / MOUSE_DIST) * 0.35;
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
+            ctx.lineTo(m.x, m.y);
+            ctx.strokeStyle = `hsla(152,80%,55%,${a})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
         }
       }
 
-      animationFrameId = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
 
-    // Event listeners
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseRef.current.x = e.clientX - rect.left;
-      mouseRef.current.y = e.clientY - rect.top;
-      mouseRef.current.active = true;
-    };
+    const onMove  = (e: MouseEvent) => { const r = canvas.getBoundingClientRect(); mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top, active: true }; };
+    const onLeave = ()              => { mouseRef.current.active = false; };
 
-    const handleMouseLeave = () => {
-      mouseRef.current.active = false;
-    };
-
-    // Hook up elements
-    window.addEventListener("resize", resizeCanvas);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
-    
-    // Initial size
-    resizeCanvas();
+    window.addEventListener("resize", resize);
+    canvas.addEventListener("mousemove",  onMove);
+    canvas.addEventListener("mouseleave", onLeave);
+    resize();
     draw();
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
-      if (canvas) {
-        canvas.removeEventListener("mousemove", handleMouseMove);
-        canvas.removeEventListener("mouseleave", handleMouseLeave);
-      }
-      cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove",  onMove);
+      canvas.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-50 dark:opacity-30 -z-5"
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none -z-[5]"
+      style={{ opacity: 0.45 }}
     />
   );
 }
