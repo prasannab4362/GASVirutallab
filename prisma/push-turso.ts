@@ -22,6 +22,34 @@ async function main() {
 
   const client = createClient({ url, authToken });
 
+  // 1. Drop existing tables in dependency order to prevent foreign key constraint errors
+  const dropTables = [
+    'DROP TABLE IF EXISTS "ProjectTask";',
+    'DROP TABLE IF EXISTS "AuditLog";',
+    'DROP TABLE IF EXISTS "Notification";',
+    'DROP TABLE IF EXISTS "Certificate";',
+    'DROP TABLE IF EXISTS "Meeting";',
+    'DROP TABLE IF EXISTS "Attendance";',
+    'DROP TABLE IF EXISTS "Submission";',
+    'DROP TABLE IF EXISTS "Assignment";',
+    'DROP TABLE IF EXISTS "Project";',
+    'DROP TABLE IF EXISTS "Batch";',
+    'DROP TABLE IF EXISTS "Mentor";',
+    'DROP TABLE IF EXISTS "Program";',
+    'DROP TABLE IF EXISTS "Student";',
+    'DROP TABLE IF EXISTS "User";'
+  ];
+
+  console.log("Cleaning up old tables on Turso...");
+  for (const dropQuery of dropTables) {
+    try {
+      await client.execute(dropQuery);
+    } catch (err) {
+      console.warn(`[Warning] Failed to run drop query: ${dropQuery}`);
+    }
+  }
+
+  // 2. Read and apply schema.sql
   const sqlPath = path.resolve(__dirname, "schema.sql");
   if (!fs.existsSync(sqlPath)) {
     console.error(`Error: Schema file not found at ${sqlPath}. Make sure prisma/schema.sql exists.`);
@@ -56,14 +84,9 @@ async function main() {
     try {
       await client.execute(stmt);
     } catch (err: any) {
-      // If table/index already exists, log it but don't fail the whole script
-      if (err.message && (err.message.includes("already exists") || err.message.includes("duplicate"))) {
-        console.warn(`[Warning] Statement ${i + 1} skipped: Table/index already exists.`);
-      } else {
-        console.error(`[Error] Statement ${i + 1} failed:`, stmt);
-        console.error(err);
-        process.exit(1);
-      }
+      console.error(`[Error] Statement ${i + 1} failed:`, stmt);
+      console.error(err);
+      process.exit(1);
     }
   }
 
