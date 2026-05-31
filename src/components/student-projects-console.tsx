@@ -35,6 +35,7 @@ interface Project {
   id: string;
   title: string;
   description: string;
+  driveLink: string | null;
   progressPercentage: number;
   status: string;
   deadline: string | Date;
@@ -65,6 +66,7 @@ export default function StudentProjectsConsole({ initialProjects, mentors }: Stu
   const [description, setDescription] = useState("");
   const [deadlineInput, setDeadlineInput] = useState("");
   const [mentorId, setMentorId] = useState(mentors[0]?.id || "");
+  const [driveLink, setDriveLink] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ success: boolean; text: string } | null>(null);
@@ -82,7 +84,14 @@ export default function StudentProjectsConsole({ initialProjects, mentors }: Stu
     setMessage(null);
 
     try {
-      const res = await createProjectAction(title, description, deadlineInput, mentorId);
+      const res = await createProjectAction(
+        title, 
+        description, 
+        deadlineInput, 
+        mentorId, 
+        undefined, 
+        driveLink.trim() || undefined
+      );
       if (res.success) {
         setMessage({ success: true, text: "Project created successfully!" });
         
@@ -316,6 +325,19 @@ export default function StudentProjectsConsole({ initialProjects, mentors }: Stu
                   required
                   value={deadlineInput}
                   onChange={(e) => setDeadlineInput(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
+                  Google Drive / Workspace Link (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={driveLink}
+                  onChange={(e) => setDriveLink(e.target.value)}
+                  placeholder="e.g. https://drive.google.com/..."
                   className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
                 />
               </div>

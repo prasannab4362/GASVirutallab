@@ -40,6 +40,7 @@ interface Program {
 
 interface Project {
   status: string;
+  driveLink: string | null;
 }
 
 interface Certificate {
@@ -115,7 +116,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
 
     const totalAtt = s.attendance?.length || 0;
     const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
-    const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+    const hasProj = s.projects?.some(p => (p.status === "COMPLETED" || p.status === "APPROVED") && p.driveLink !== null && p.driveLink.trim() !== "") || false;
     const hasCert = (s.certificates?.length || 0) > 0;
 
     if (filterTab === "ELIGIBLE") {
@@ -426,7 +427,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
             students.filter(s => {
               const totalAtt = s.attendance?.length || 0;
               const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
-              const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+              const hasProj = s.projects?.some(p => (p.status === "COMPLETED" || p.status === "APPROVED") && p.driveLink !== null && p.driveLink.trim() !== "") || false;
               const hasCert = (s.certificates?.length || 0) > 0;
               return avgAtt >= 75 && hasProj && !hasCert;
             }).length
@@ -489,7 +490,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                     {(() => {
                       const totalAtt = s.attendance?.length || 0;
                       const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
-                      const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+                      const hasProj = s.projects?.some(p => (p.status === "COMPLETED" || p.status === "APPROVED") && p.driveLink !== null && p.driveLink.trim() !== "") || false;
                       const hasCert = (s.certificates?.length || 0) > 0;
 
                       if (hasCert) {
@@ -509,7 +510,15 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                       
                       const missing = [];
                       if (avgAtt < 75) missing.push(`Attendance: ${avgAtt}% < 75%`);
-                      if (!hasProj) missing.push("No completed project");
+                      
+                      const hasCompletedButNoDrive = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") && !s.projects?.some(p => (p.status === "COMPLETED" || p.status === "APPROVED") && p.driveLink !== null && p.driveLink.trim() !== "");
+                      if (!hasProj) {
+                        if (hasCompletedButNoDrive) {
+                          missing.push("Completed project lacks Google Drive link");
+                        } else {
+                          missing.push("No completed project");
+                        }
+                      }
 
                       return (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500 text-[10px] font-semibold border border-zinc-200" title={missing.join(" | ")}>

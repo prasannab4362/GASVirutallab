@@ -9,7 +9,8 @@ export async function createProjectAction(
   description: string,
   deadlineInput: string,
   mentorId: string,
-  studentIdInput?: string
+  studentIdInput?: string,
+  driveLink?: string
 ) {
   try {
     const session = await getSession();
@@ -46,6 +47,7 @@ export async function createProjectAction(
       data: {
         title,
         description,
+        driveLink: driveLink || null,
         mentorId,
         studentId,
         deadline,
@@ -191,5 +193,32 @@ export async function deleteProjectTaskAction(taskId: string) {
   } catch (error) {
     console.error("Failed to delete task:", error);
     return { success: false, error: "Failed to delete task." };
+  }
+}
+
+export async function updateProjectDriveLinkAction(projectId: string, driveLink: string) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: "Unauthorized access." };
+    }
+
+    if (!projectId) {
+      return { success: false, error: "Missing project identifier." };
+    }
+
+    await prisma.project.update({
+      where: { id: projectId },
+      data: {
+        driveLink: driveLink.trim() || null,
+      },
+    });
+
+    revalidatePath("/student/projects");
+    revalidatePath("/mentor/students");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update project drive link:", error);
+    return { success: false, error: "An error occurred while saving drive link." };
   }
 }

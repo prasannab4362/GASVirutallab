@@ -16,6 +16,7 @@ export default async function AdminMentorsPage() {
       user: true,
       batches: {
         select: {
+          id: true,
           batchCode: true
         }
       }
@@ -27,6 +28,12 @@ export default async function AdminMentorsPage() {
     }
   });
 
+  // Fetch active cohort batches to allow assignments
+  const batches = await prisma.batch.findMany({
+    where: { status: "ACTIVE" },
+    orderBy: { batchCode: "asc" }
+  });
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div>
@@ -36,7 +43,10 @@ export default async function AdminMentorsPage() {
         </p>
       </div>
 
-      <MentorsManager mentors={JSON.parse(JSON.stringify(mentors))} />
+      <MentorsManager 
+        mentors={JSON.parse(JSON.stringify(mentors))} 
+        batches={JSON.parse(JSON.stringify(batches))} 
+      />
     </div>
   );
 }

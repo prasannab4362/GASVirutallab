@@ -29,6 +29,7 @@ enum AttendanceStatus {
   PRESENT
   PARTIAL
   INACTIVE
+  PENDING
 }
 
 model User {
@@ -107,6 +108,7 @@ model Project {
   id                 String        @id @default(uuid())
   title              String
   description        String
+  driveLink          String?
   mentorId           String
   studentId          String
   deadline           DateTime

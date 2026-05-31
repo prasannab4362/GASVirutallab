@@ -12,9 +12,11 @@ import {
   Calendar,
   CheckCircle2,
   Award,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import ProjectDetailsBoard from "./project-details-board";
+import { approveAttendanceAction } from "@/lib/actions/attendance-actions";
 
 interface User {
   name: string;
@@ -39,6 +41,7 @@ interface Project {
   id: string;
   title: string;
   description: string;
+  driveLink: string | null;
   progressPercentage: number;
   status: string;
   deadline: string | Date;
@@ -51,6 +54,14 @@ interface Project {
   };
 }
 
+interface Attendance {
+  id: string;
+  date: string | Date;
+  score: number;
+  status: string;
+  details: string | null;
+}
+
 interface Student {
   id: string;
   matricNumber: string | null;
@@ -59,6 +70,7 @@ interface Student {
   program: Program | null;
   submissions: any[];
   projects: Project[];
+  attendance: Attendance[];
 }
 
 interface MentorStudentsConsoleProps {
@@ -69,6 +81,28 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [search, setSearch] = useState("");
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ success: boolean; text: string } | null>(null);
+
+  const handleApproveAttendance = async (attendanceId: string) => {
+    setApprovingId(attendanceId);
+    setActionMessage(null);
+    try {
+      const res = await approveAttendanceAction(attendanceId);
+      if (res.success) {
+        setActionMessage({ success: true, text: "EOD check-in approved successfully!" });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setActionMessage({ success: false, text: res.error || "Failed to approve check-in." });
+      }
+    } catch (err) {
+      setActionMessage({ success: false, text: "An error occurred." });
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   const filteredStudents = students.filter(s => 
     s.user.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -186,15 +220,100 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
               </div>
 
               {/* Student Cohort Info */}
-              <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-zinc-700 dark:text-zinc-350">
+              <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-zinc-700 dark:text-zinc-355">
                 <div className="p-4 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800/60 space-y-1">
                   <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Cohort Batch</span>
                   <span className="text-zinc-900 dark:text-white font-mono">{selectedStudent.batch?.batchCode || "N/A"}</span>
                 </div>
-                <div className="p-4 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800/60 space-y-1">
+                <div className="p-4 bg-zinc-55/40 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800/60 space-y-1">
                   <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">Education Track</span>
                   <span className="truncate block text-zinc-905 dark:text-zinc-200">{selectedStudent.program?.title || "N/A"}</span>
                 </div>
+              </div>
+
+              {/* Daily Standups / Attendance Review */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  Daily EOD Standup logs
+                </h4>
+
+                {actionMessage && (
+                  <div className={`p-4 rounded-xl text-xs font-semibold ${
+                    actionMessage.success ? "bg-green-50 text-green-700 border border-green-150" : "bg-red-50 text-red-750 border border-red-155"
+                  }`}>
+                    {actionMessage.text}
+                  </div>
+                )}
+
+                {(!selectedStudent.attendance || selectedStudent.attendance.length === 0) ? (
+                  <div className="p-6 bg-zinc-55/20 dark:bg-zinc-800/20 border border-zinc-100 dark:border-zinc-800/40 rounded-2xl text-center text-xs text-zinc-400 italic">
+                    No attendance logs or standups submitted yet.
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                    {selectedStudent.attendance.map((att) => {
+                      const isPending = att.status === "PENDING";
+                      return (
+                        <div 
+                          key={att.id} 
+                          className={`p-4 rounded-2xl border text-xs transition-all ${
+                            isPending 
+                              ? "bg-amber-50/40 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40" 
+                              : att.status === "PRESENT" 
+                                ? "bg-green-50/50 dark:bg-green-950/10 border-green-150 dark:border-green-905/40 text-zinc-700 dark:text-zinc-300"
+                                : "bg-zinc-50 dark:bg-zinc-800/20 border-zinc-150 dark:border-zinc-805/50"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center mb-2.5">
+                            <span className="font-semibold text-zinc-500">
+                              {new Date(att.date).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                            
+                            <div className="flex items-center gap-2">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                                isPending 
+                                  ? "bg-amber-100/70 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" 
+                                  : att.status === "PRESENT" 
+                                    ? "bg-green-100/70 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                    : "bg-zinc-100 text-zinc-650"
+                              }`}>
+                                {att.status} ({att.score}%)
+                              </span>
+
+                              {isPending && (
+                                <button
+                                  type="button"
+                                  disabled={approvingId === att.id}
+                                  onClick={() => handleApproveAttendance(att.id)}
+                                  className="px-2.5 py-1 text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded-lg transition-all shrink-0 shadow-sm"
+                                >
+                                  {approvingId === att.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    "Approve Check-In"
+                                  )}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {att.details ? (
+                            <p className="text-zinc-705 dark:text-zinc-300 font-medium whitespace-pre-line bg-white/70 dark:bg-zinc-900/50 p-3 rounded-xl border border-zinc-150/40 dark:border-zinc-800/40">
+                              {att.details}
+                            </p>
+                          ) : (
+                            <span className="text-[10px] text-zinc-400 italic">No notes attached.</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Projects Pipeline */}

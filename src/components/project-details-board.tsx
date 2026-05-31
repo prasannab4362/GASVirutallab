@@ -13,13 +13,15 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  ExternalLink
 } from "lucide-react";
 import { 
   createProjectTaskAction, 
   updateProjectTaskStatusAction, 
   deleteProjectTaskAction,
-  updateProjectProgressAction
+  updateProjectProgressAction,
+  updateProjectDriveLinkAction
 } from "@/lib/actions/project-actions";
 
 interface Task {
@@ -32,6 +34,7 @@ interface Project {
   id: string;
   title: string;
   description: string;
+  driveLink: string | null;
   progressPercentage: number;
   status: string;
   tasks: Task[];
@@ -51,6 +54,10 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
   const [progressVal, setProgressVal] = useState(project.progressPercentage);
   const [statusVal, setStatusVal] = useState(project.status);
   const [isSavingProgress, setIsSavingProgress] = useState(false);
+  
+  // Google Drive state
+  const [driveLinkInput, setDriveLinkInput] = useState(project.driveLink || "");
+  const [isSavingDriveLink, setIsSavingDriveLink] = useState(false);
   
   const [message, setMessage] = useState<{ success: boolean; text: string } | null>(null);
 
@@ -142,8 +149,82 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
     }
   };
 
+  const handleSaveDriveLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingDriveLink(true);
+    setMessage(null);
+
+    try {
+      const res = await updateProjectDriveLinkAction(project.id, driveLinkInput);
+      if (res.success) {
+        setMessage({ success: true, text: "Google Drive workspace link updated!" });
+        setTimeout(() => {
+          window.location.reload();
+        }, 850);
+      } else {
+        setMessage({ success: false, text: res.error || "Failed to save drive link." });
+      }
+    } catch (err) {
+      setMessage({ success: false, text: "An error occurred." });
+    } finally {
+      setIsSavingDriveLink(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
+      {/* Google Drive / Workspace Link Banner */}
+      <div className="p-6 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-150 dark:border-zinc-800/60 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h4 className="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+              <ExternalLink className="w-4 h-4 text-blue-600" />
+              Project Deliverables & Drive Workspace
+            </h4>
+            <p className="text-[10px] text-zinc-400">
+              Submit your workspace folder, notebooks, GitHub repositories, or Google Drive deliverables directory.
+            </p>
+          </div>
+
+          {project.driveLink ? (
+            <a
+              href={project.driveLink.startsWith("http") ? project.driveLink : `https://${project.driveLink}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-md shadow-blue-500/10 self-start sm:self-center"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Open Project Deliverables</span>
+            </a>
+          ) : (
+            <span className="text-xs text-zinc-450 italic">No workspace link uploaded yet.</span>
+          )}
+        </div>
+
+        {/* Edit Form */}
+        {(!isMentorView || project.driveLink) && (
+          <form onSubmit={handleSaveDriveLink} className="flex gap-2 max-w-xl text-xs pt-2 border-t border-zinc-200/50 dark:border-zinc-805/50">
+            <input
+              type="text"
+              placeholder="Paste Google Drive, GitHub, or Colab link..."
+              value={driveLinkInput}
+              onChange={(e) => setDriveLinkInput(e.target.value)}
+              className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-250 dark:border-zinc-750 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all dark:text-white"
+            />
+            <button
+              type="submit"
+              disabled={isSavingDriveLink}
+              className="px-4 py-2 font-semibold text-zinc-750 dark:text-zinc-200 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-250 dark:border-zinc-750 rounded-xl transition-all flex items-center justify-center gap-1 shrink-0"
+            >
+              {isSavingDriveLink ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <span>Save Link</span>
+              )}
+            </button>
+          </form>
+        )}
+      </div>
       {/* Messages */}
       {message && (
         <div className={`p-4 rounded-xl text-xs font-semibold ${
@@ -217,28 +298,32 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
             Kanban Task Board
           </h4>
           
-          {/* Add Task Quick form */}
-          <form onSubmit={handleAddTask} className="flex gap-2 w-full sm:max-w-xs">
-            <input
-              type="text"
-              required
-              placeholder="Add new task..."
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              className="flex-1 px-3 py-2 bg-zinc-55/40 dark:bg-zinc-800/40 border border-zinc-250 dark:border-zinc-750 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
-            />
-            <button
-              type="submit"
-              disabled={isAddingTask}
-              className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-500/10 flex items-center justify-center"
-            >
-              {isAddingTask ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Plus className="w-4 h-4" />
-              )}
-            </button>
-          </form>
+          {/* Add Task Quick form - Only available to Mentors */}
+          {isMentorView ? (
+            <form onSubmit={handleAddTask} className="flex gap-2 w-full sm:max-w-xs">
+              <input
+                type="text"
+                required
+                placeholder="Add new task..."
+                value={taskTitle}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                className="flex-1 px-3 py-2 bg-zinc-55/40 dark:bg-zinc-800/40 border border-zinc-250 dark:border-zinc-750 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-650/20 focus:border-blue-600 transition-all dark:text-white"
+              />
+              <button
+                type="submit"
+                disabled={isAddingTask}
+                className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md shadow-blue-500/10 flex items-center justify-center"
+              >
+                {isAddingTask ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4" />
+                )}
+              </button>
+            </form>
+          ) : (
+            <span className="text-[10px] text-zinc-400 font-medium">Only mentors can assign tasks</span>
+          )}
         </div>
 
         {/* Columns Grid */}
@@ -269,14 +354,16 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
                     >
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      onClick={() => handleDeleteTask(t.id)}
-                      disabled={updatingTaskId === t.id}
-                      className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-650 transition-colors"
-                      title="Delete Task"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {isMentorView && (
+                      <button
+                        onClick={() => handleDeleteTask(t.id)}
+                        disabled={updatingTaskId === t.id}
+                        className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-650 transition-colors"
+                        title="Delete Task"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -316,13 +403,15 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
                     >
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      onClick={() => handleDeleteTask(t.id)}
-                      disabled={updatingTaskId === t.id}
-                      className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-655 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {isMentorView && (
+                      <button
+                        onClick={() => handleDeleteTask(t.id)}
+                        disabled={updatingTaskId === t.id}
+                        className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-655 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -354,13 +443,15 @@ export default function ProjectDetailsBoard({ project, isMentorView = false }: P
                     >
                       <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      onClick={() => handleDeleteTask(t.id)}
-                      disabled={updatingTaskId === t.id}
-                      className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-650 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {isMentorView && (
+                      <button
+                        onClick={() => handleDeleteTask(t.id)}
+                        disabled={updatingTaskId === t.id}
+                        className="p-1 rounded-md text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-red-650 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

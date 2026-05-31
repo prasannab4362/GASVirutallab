@@ -35,6 +35,11 @@ export default async function MentorStudentsPage() {
         }
       },
       submissions: true,
+      attendance: {
+        orderBy: {
+          date: "desc"
+        }
+      },
       projects: {
         include: {
           mentor: {

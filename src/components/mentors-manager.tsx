@@ -25,6 +25,7 @@ interface User {
 }
 
 interface Batch {
+  id: string;
   batchCode: string;
 }
 
@@ -36,9 +37,10 @@ interface Mentor {
 
 interface MentorsManagerProps {
   mentors: Mentor[];
+  batches: Batch[];
 }
 
-export default function MentorsManager({ mentors: initialMentors }: MentorsManagerProps) {
+export default function MentorsManager({ mentors: initialMentors, batches }: MentorsManagerProps) {
   const [mentors, setMentors] = useState<Mentor[]>(initialMentors);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -49,6 +51,7 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
   const [editEmail, setEditEmail] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [editStatus, setEditStatus] = useState("ACTIVE");
+  const [editBatchIds, setEditBatchIds] = useState<string[]>([]);
 
   // Delete State
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -58,6 +61,7 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedBatchIds, setSelectedBatchIds] = useState<string[]>([]);
   
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -76,7 +80,7 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
     setMessage(null);
 
     try {
-      const res = await enrollMentorAction(name, email, password);
+      const res = await enrollMentorAction(name, email, password, selectedBatchIds);
       if (res.success) {
         setMessage({ success: true, text: "Mentor registered successfully!" });
         
@@ -106,7 +110,8 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
         editName,
         editEmail,
         editStatus,
-        editPassword || undefined
+        editPassword || undefined,
+        editBatchIds
       );
 
       if (res.success) {
@@ -240,6 +245,41 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
               </div>
             </div>
 
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
+                Assign Cohort Batches
+              </label>
+              {batches.length === 0 ? (
+                <p className="text-xs text-zinc-450 italic">No cohort batches active currently. Create a batch first.</p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {batches.map((b) => {
+                    const isSelected = selectedBatchIds.includes(b.id);
+                    return (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedBatchIds(selectedBatchIds.filter((id) => id !== b.id));
+                          } else {
+                            setSelectedBatchIds([...selectedBatchIds, b.id]);
+                          }
+                        }}
+                        className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all text-center ${
+                          isSelected
+                            ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-600 shadow-sm"
+                            : "bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-805 text-zinc-650 hover:border-zinc-300 dark:hover:border-zinc-700"
+                        }`}
+                      >
+                        {b.batchCode}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -304,6 +344,7 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
                         setEditName(m.user.name);
                         setEditEmail(m.user.email);
                         setEditStatus(m.user.status);
+                        setEditBatchIds(m.batches.map(b => b.id) || []);
                         setShowEditModal(true);
                       }}
                       className="p-1.5 text-zinc-400 hover:text-blue-650 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-all inline-flex"
@@ -394,6 +435,41 @@ export default function MentorsManager({ mentors: initialMentors }: MentorsManag
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="SUSPENDED">SUSPENDED</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">
+                  Assign Cohort Batches
+                </label>
+                {batches.length === 0 ? (
+                  <p className="text-xs text-zinc-455 italic">No cohort batches active currently.</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    {batches.map((b) => {
+                      const isSelected = editBatchIds.includes(b.id);
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setEditBatchIds(editBatchIds.filter((id) => id !== b.id));
+                            } else {
+                              setEditBatchIds([...editBatchIds, b.id]);
+                            }
+                          }}
+                          className={`px-3 py-2 rounded-xl border text-[11px] font-bold transition-all text-center ${
+                            isSelected
+                              ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-600 shadow-sm"
+                              : "bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800 text-zinc-600 hover:border-zinc-300 dark:hover:border-zinc-700"
+                          }`}
+                        >
+                          {b.batchCode}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div>

@@ -75,7 +75,7 @@ export async function enrollStudentAction(
 }
 
 // 2. Enroll Mentor Action
-export async function enrollMentorAction(name: string, email: string, password: string) {
+export async function enrollMentorAction(name: string, email: string, password: string, batchIds?: string[]) {
   try {
     const session = await getSession();
     if (!session || session.role !== "ADMIN") {
@@ -109,11 +109,18 @@ export async function enrollMentorAction(name: string, email: string, password: 
         },
       });
 
-      await tx.mentor.create({
+      const mentor = await tx.mentor.create({
         data: {
           userId: user.id,
         },
       });
+
+      if (batchIds && batchIds.length > 0) {
+        await tx.batch.updateMany({
+          where: { id: { in: batchIds } },
+          data: { mentorId: mentor.id }
+        });
+      }
 
       await tx.auditLog.create({
         data: {
@@ -445,7 +452,8 @@ export async function updateMentorAction(
   name: string,
   email: string,
   status: string,
-  password?: string
+  password?: string,
+  batchIds?: string[]
 ) {
   try {
     const session = await getSession();
@@ -486,11 +494,25 @@ export async function updateMentorAction(
         data: updateData,
       });
 
+      // 1. Dissociate current batches for this mentor
+      await tx.batch.updateMany({
+        where: { mentorId: mentorId },
+        data: { mentorId: null }
+      });
+
+      // 2. Associate selected batches with this mentor
+      if (batchIds && batchIds.length > 0) {
+        await tx.batch.updateMany({
+          where: { id: { in: batchIds } },
+          data: { mentorId: mentorId }
+        });
+      }
+
       await tx.auditLog.create({
         data: {
           userId: session.userId,
           action: "UPDATE_MENTOR",
-          details: `Updated mentor ${name} (${email}) profile. Status: ${status}`,
+          details: `Updated mentor ${name} (${email}) profile and batch allocations. Status: ${status}`,
         },
       });
     });

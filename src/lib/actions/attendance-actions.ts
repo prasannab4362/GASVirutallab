@@ -21,7 +21,7 @@ export async function submitDailyCheckinAction(eodText: string) {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    // Upsert attendance record for today (PRESENT, 100% score)
+    // Upsert attendance record for today (PENDING, 0% score until mentor accepts)
     await prisma.attendance.upsert({
       where: {
         studentId_date: {
@@ -30,15 +30,15 @@ export async function submitDailyCheckinAction(eodText: string) {
         },
       },
       update: {
-        score: 100,
-        status: "PRESENT",
+        score: 0,
+        status: "PENDING",
         details: eodText.trim(),
       },
       create: {
         studentId,
         date: todayDate,
-        score: 100,
-        status: "PRESENT",
+        score: 0,
+        status: "PENDING",
         details: eodText.trim(),
       },
     });
@@ -100,5 +100,54 @@ export async function submitDailyCheckinAction(eodText: string) {
   } catch (error) {
     console.error("Daily check-in failure:", error);
     return { success: false, error: "An error occurred while submitting check-in." };
+  }
+}
+
+export async function approveAttendanceAction(attendanceId: string) {
+  try {
+    const session = await getSession();
+    if (!session || (session.role !== "MENTOR" && session.role !== "ADMIN")) {
+      return { success: false, error: "Unauthorized access. Only mentors or admins can approve EOD logs." };
+    }
+
+    if (!attendanceId) {
+      return { success: false, error: "Missing attendance record identifier." };
+    }
+
+    const attendance = await prisma.attendance.update({
+      where: { id: attendanceId },
+      data: {
+        status: "PRESENT",
+        score: 100,
+      },
+      include: {
+        student: {
+          include: {
+            user: { select: { name: true } },
+          },
+        },
+      },
+    });
+
+    // Notify the student that their EOD standup check-in was approved
+    await prisma.notification.create({
+      data: {
+        userId: attendance.student.userId,
+        title: "Daily Standup Approved",
+        message: `Your EOD check-in for ${new Date(attendance.date).toLocaleDateString()} has been approved (100% PRESENT).`,
+        type: "FEEDBACK",
+      },
+    });
+
+    // Revalidate paths to refresh components
+    revalidatePath("/student/dashboard");
+    revalidatePath("/student/attendance");
+    revalidatePath("/admin/attendance");
+    revalidatePath("/mentor/students");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to approve attendance check-in:", error);
+    return { success: false, error: "An error occurred while approving check-in." };
   }
 }
