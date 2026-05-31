@@ -78,9 +78,9 @@ export default function Sidebar({ role, userName }: SidebarProps) {
       <div className="h-16 flex items-center px-6 border-b border-zinc-200/80 bg-zinc-50/50">
         <Link href="/" className="flex items-center gap-2">
           <img 
-            src="/logo.jpg" 
+            src="/logo.png" 
             alt="Green Automation Solution Logo" 
-            className="w-8 h-8 rounded-lg object-contain bg-white border border-zinc-150 shadow-sm"
+            className="w-8 h-8 object-contain filter drop-shadow-sm"
           />
           <div>
             <span className="font-semibold text-zinc-950 font-sans tracking-tight block leading-none">GAS Virtual Lab</span>

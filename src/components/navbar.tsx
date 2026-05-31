@@ -117,9 +117,9 @@ export default function Navbar({ role, userName, notifications }: NavbarProps) {
             <div className="flex items-center justify-between px-4 pb-4 border-b border-zinc-200/80">
               <div className="flex items-center gap-1.5">
                 <img 
-                  src="/logo.jpg" 
+                  src="/logo.png" 
                   alt="Green Automation Solution Logo" 
-                  className="w-6 h-6 rounded-md object-contain bg-white border border-zinc-150 shadow-sm"
+                  className="w-6 h-6 object-contain filter drop-shadow-sm"
                 />
                 <span className="font-bold text-zinc-950 text-xs">GAS Virtual Lab</span>
               </div>

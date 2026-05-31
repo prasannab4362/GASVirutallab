@@ -71,9 +71,9 @@ export default function LoginPage() {
         {/* Brand Header */}
         <div className="text-center">
           <img 
-            src="/logo.jpg" 
+            src="/logo.png" 
             alt="Green Automation Solution Logo" 
-            className="w-16 h-16 rounded-2xl object-contain bg-white border border-zinc-150 shadow-md mx-auto mb-4"
+            className="w-16 h-16 object-contain filter drop-shadow-md mx-auto mb-4"
           />
           <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-55">
             GAS Virtual AI Lab
