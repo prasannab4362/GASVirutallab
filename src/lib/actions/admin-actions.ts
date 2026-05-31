@@ -273,12 +273,18 @@ export async function createBatchAction(
   }
 }
 
-// 5. Generate Certificate Action
+// 5. Generate Certificate Action (ADMIN or MENTOR only)
 export async function generateCertificateAction(studentId: string, programId: string, certNumber: string) {
   try {
     const session = await getSession();
-    if (!session || session.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized access." };
+    if (!session || (session.role !== "ADMIN" && session.role !== "MENTOR")) {
+      return { success: false, error: "Only admins and mentors can issue certificates." };
+    }
+
+    // Verify user exists in database to prevent stale session errors
+    const issuerUser = await prisma.user.findUnique({ where: { id: session.userId } });
+    if (!issuerUser) {
+      return { success: false, error: "Your session is invalid. Please log out and sign in again." };
     }
 
     if (!studentId || !programId || !certNumber) {
@@ -328,7 +334,7 @@ export async function generateCertificateAction(studentId: string, programId: st
         data: {
           userId: session.userId,
           action: "RELEASE_CERTIFICATE",
-          details: `Released certificate ${certNumber} to student ID: ${studentId}`,
+          details: `[${session.role}] Released certificate ${certNumber} to student ID: ${studentId}`,
         },
       });
     });
@@ -336,6 +342,7 @@ export async function generateCertificateAction(studentId: string, programId: st
     revalidatePath("/admin/certificates");
     revalidatePath("/admin/students");
     revalidatePath("/student/certificates");
+    revalidatePath("/mentor/students");
     return { success: true };
   } catch (error) {
     console.error("Certificate generation error:", error);

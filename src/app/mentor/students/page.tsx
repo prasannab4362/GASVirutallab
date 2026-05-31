@@ -31,7 +31,14 @@ export default async function MentorStudentsPage() {
       },
       program: {
         select: {
+          id: true,
           title: true
+        }
+      },
+      certificates: {
+        select: {
+          id: true,
+          certificateNumber: true
         }
       },
       submissions: true,
