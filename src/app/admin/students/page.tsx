@@ -15,7 +15,10 @@ export default async function AdminStudentsPage() {
     include: {
       user: true,
       batch: true,
-      program: true
+      program: true,
+      projects: true,
+      certificates: true,
+      attendance: true
     },
     orderBy: {
       user: {

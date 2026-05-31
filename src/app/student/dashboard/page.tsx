@@ -15,6 +15,7 @@ import {
   UserCheck
 } from "lucide-react";
 import Link from "next/link";
+import DailyStandupWidget from "@/components/daily-standup-widget";
 
 export default async function StudentDashboardPage() {
   const session = await getSession();
@@ -79,6 +80,15 @@ export default async function StudentDashboardPage() {
   const totalProjects = student.projects.length;
 
   const upcomingMeeting = student.batch?.meetings[0];
+
+  // Lookup today's checkin record (at normalized 00:00:00 date)
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  const todayCheckin = student.attendance.find((a) => {
+    const aDate = new Date(a.date);
+    aDate.setHours(0, 0, 0, 0);
+    return aDate.getTime() === todayDate.getTime();
+  }) || null;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -157,6 +167,9 @@ export default async function StudentDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Daily Check-In / Standup Updates */}
+      <DailyStandupWidget initialCheckin={todayCheckin ? { details: todayCheckin.details } : null} />
 
       {/* Main Grid: Meeting Sync + Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

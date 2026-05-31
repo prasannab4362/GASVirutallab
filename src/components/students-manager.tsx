@@ -38,12 +38,27 @@ interface Program {
   title: string;
 }
 
+interface Project {
+  status: string;
+}
+
+interface Certificate {
+  id: string;
+}
+
+interface Attendance {
+  score: number;
+}
+
 interface Student {
   id: string;
   matricNumber: string | null;
   user: User;
   batch: Batch | null;
   program: Program | null;
+  projects: Project[];
+  certificates: Certificate[];
+  attendance: Attendance[];
 }
 
 interface StudentsManagerProps {
@@ -87,12 +102,30 @@ export default function StudentsManager({ students: initialStudents, batches, pr
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState<{ success: boolean; text: string } | null>(null);
+  
+  // Filtration Tab state: ALL, ELIGIBLE, GRADUATED
+  const [filterTab, setFilterTab] = useState<"ALL" | "ELIGIBLE" | "GRADUATED">("ALL");
 
-  const filteredStudents = students.filter(s => 
-    s.user.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.user.email.toLowerCase().includes(search.toLowerCase()) ||
-    (s.matricNumber && s.matricNumber.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredStudents = students.filter(s => {
+    const matchesSearch = s.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.user.email.toLowerCase().includes(search.toLowerCase()) ||
+      (s.matricNumber && s.matricNumber.toLowerCase().includes(search.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    const totalAtt = s.attendance?.length || 0;
+    const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
+    const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+    const hasCert = (s.certificates?.length || 0) > 0;
+
+    if (filterTab === "ELIGIBLE") {
+      return avgAtt >= 75 && hasProj && !hasCert;
+    }
+    if (filterTab === "GRADUATED") {
+      return hasCert;
+    }
+    return true;
+  });
 
   const handleEnrollSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -369,6 +402,50 @@ export default function StudentsManager({ students: initialStudents, batches, pr
         </div>
       )}
 
+      {/* Filtration Tabs */}
+      <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-1 text-xs">
+        <button
+          onClick={() => setFilterTab("ALL")}
+          className={`px-4 py-2 font-bold transition-all rounded-lg border ${
+            filterTab === "ALL"
+              ? "bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-950/40 shadow-sm"
+              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-350 border-transparent"
+          }`}
+        >
+          All Fellows ({students.length})
+        </button>
+        <button
+          onClick={() => setFilterTab("ELIGIBLE")}
+          className={`px-4 py-2 font-bold transition-all rounded-lg border ${
+            filterTab === "ELIGIBLE"
+              ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-950/40 shadow-sm"
+              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-350 border-transparent"
+          }`}
+        >
+          Eligible for Graduation ({
+            students.filter(s => {
+              const totalAtt = s.attendance?.length || 0;
+              const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
+              const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+              const hasCert = (s.certificates?.length || 0) > 0;
+              return avgAtt >= 75 && hasProj && !hasCert;
+            }).length
+          })
+        </button>
+        <button
+          onClick={() => setFilterTab("GRADUATED")}
+          className={`px-4 py-2 font-bold transition-all rounded-lg border ${
+            filterTab === "GRADUATED"
+              ? "bg-indigo-50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-950/40 shadow-sm"
+              : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-350 border-transparent"
+          }`}
+        >
+          Graduated / Certified ({
+            students.filter(s => (s.certificates?.length || 0) > 0).length
+          })
+        </button>
+      </div>
+
       {/* Student List Table */}
       <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-850 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
@@ -379,6 +456,7 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                 <th className="py-4 px-4">Contact</th>
                 <th className="py-4 px-4">Cohort Batch</th>
                 <th className="py-4 px-4">Status</th>
+                <th className="py-4 px-4">Graduation Readiness</th>
                 <th className="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -402,10 +480,43 @@ export default function StudentsManager({ students: initialStudents, batches, pr
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                       s.user.status === "ACTIVE" 
                         ? "bg-green-50 text-green-700 border border-green-150" 
-                        : "bg-red-50 text-red-700 border border-red-150"
+                        : "bg-red-50 text-red-700 border border-red-155"
                     }`}>
                       {s.user.status}
                     </span>
+                  </td>
+                  <td className="py-4 px-4">
+                    {(() => {
+                      const totalAtt = s.attendance?.length || 0;
+                      const avgAtt = totalAtt > 0 ? Math.round(s.attendance.reduce((sum, curr) => sum + curr.score, 0) / totalAtt) : 0;
+                      const hasProj = s.projects?.some(p => p.status === "COMPLETED" || p.status === "APPROVED") || false;
+                      const hasCert = (s.certificates?.length || 0) > 0;
+
+                      if (hasCert) {
+                        return (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-150" title="Graduation certificate officially issued">
+                            Graduated
+                          </span>
+                        );
+                      }
+                      if (avgAtt >= 75 && hasProj) {
+                        return (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-150" title="Meets attendance (>=75%) and project complete requirements">
+                            Ready to Graduate
+                          </span>
+                        );
+                      }
+                      
+                      const missing = [];
+                      if (avgAtt < 75) missing.push(`Attendance: ${avgAtt}% < 75%`);
+                      if (!hasProj) missing.push("No completed project");
+
+                      return (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500 text-[10px] font-semibold border border-zinc-200" title={missing.join(" | ")}>
+                          Incomplete ({avgAtt}%)
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="py-4 px-6 text-right space-x-2">
                     <button
