@@ -39,30 +39,6 @@ export default function LoginPage() {
     }
   };
 
-  const getRoleInfo = () => {
-    switch (selectedRole) {
-      case "STUDENT":
-        return {
-          title: "Student Portal",
-          desc: "Access fellowship tasks, upload assignments, and track attendance.",
-          defaultUser: "student@gas.ai / student123"
-        };
-      case "MENTOR":
-        return {
-          title: "Mentor Workspace",
-          desc: "Review submissions, grade tasks, and sync with your cohorts.",
-          defaultUser: "mentor@gas.ai / mentor123"
-        };
-      case "ADMIN":
-        return {
-          title: "Platform Console",
-          desc: "Manage programs, enroll mentors, and audit system activities.",
-          defaultUser: "admin@gas.ai / admin123"
-        };
-    }
-  };
-
-  const roleInfo = getRoleInfo();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-12 sm:px-6 lg:px-8 font-sans">
@@ -104,20 +80,12 @@ export default function LoginPage() {
                 {role === "STUDENT" && <GraduationCap className="w-4 h-4" />}
                 {role === "MENTOR" && <User className="w-4 h-4" />}
                 {role === "ADMIN" && <Shield className="w-4 h-4" />}
-                <span>{role.charAt(0) + role.slice(1).toLowerCase()}</span>
+                <span>{role === "STUDENT" ? "Intern" : role.charAt(0) + role.slice(1).toLowerCase()}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Dynamic Portal Info Card */}
-        <div className="p-4 bg-zinc-50 dark:bg-zinc-800/35 rounded-2xl border border-zinc-100 dark:border-zinc-800/40">
-          <h3 className="font-semibold text-zinc-800 dark:text-zinc-200 text-sm">{roleInfo.title}</h3>
-          <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1 leading-relaxed">{roleInfo.desc}</p>
-          <div className="mt-2 flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 w-fit px-2 py-0.5 rounded-md font-mono">
-            Demo account: {roleInfo.defaultUser}
-          </div>
-        </div>
 
         {/* Error Alert */}
         {error && (
