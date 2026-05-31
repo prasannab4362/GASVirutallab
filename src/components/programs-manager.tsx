@@ -90,12 +90,12 @@ export default function ProgramsManager({ programs: initialPrograms, mentors }: 
         programEnd
       );
 
-      if (res.success) {
+      if (res.success && res.program) {
         setMessage({ success: true, text: "Program created successfully!" });
         
         // Add to state
         const newProgram: Program = {
-          id: Math.random().toString(),
+          id: res.program.id,
           title: programTitle,
           description: programDesc,
           duration: programDuration,
@@ -105,6 +105,9 @@ export default function ProgramsManager({ programs: initialPrograms, mentors }: 
         };
 
         setPrograms([newProgram, ...programs]);
+        if (!selectedProgramId) {
+          setSelectedProgramId(res.program.id);
+        }
 
         // Reset
         setProgramTitle("");
@@ -141,13 +144,13 @@ export default function ProgramsManager({ programs: initialPrograms, mentors }: 
         batchEnd
       );
 
-      if (res.success) {
+      if (res.success && res.batch) {
         setMessage({ success: true, text: `Batch ${batchCode} scheduled successfully!` });
         
         // Update local state
         const mentorObj = mentors.find(m => m.id === selectedMentorId) || null;
         const newBatch: Batch = {
-          id: Math.random().toString(),
+          id: res.batch.id,
           batchCode,
           startDate: new Date(batchStart),
           endDate: new Date(batchEnd),

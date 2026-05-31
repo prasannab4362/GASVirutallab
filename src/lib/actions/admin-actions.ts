@@ -173,8 +173,8 @@ export async function createProgramAction(
       return { success: false, error: "Please enter valid start and end dates." };
     }
 
-    await prisma.$transaction(async (tx) => {
-      const program = await tx.program.create({
+    const program = await prisma.$transaction(async (tx) => {
+      const p = await tx.program.create({
         data: {
           title,
           description,
@@ -191,11 +191,12 @@ export async function createProgramAction(
           details: `Created educational program: ${title}`,
         },
       });
+      return p;
     });
 
     revalidatePath("/admin/programs");
     revalidatePath("/admin/dashboard");
-    return { success: true };
+    return { success: true, program };
   } catch (error: any) {
     console.error("Program creation failure:", error);
     return { success: false, error: `Failed to create program: ${error.message || error}` };
@@ -244,8 +245,8 @@ export async function createBatchAction(
       return { success: false, error: "Batch code already exists." };
     }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.batch.create({
+    const batch = await prisma.$transaction(async (tx) => {
+      const b = await tx.batch.create({
         data: {
           batchCode,
           programId,
@@ -262,11 +263,12 @@ export async function createBatchAction(
           details: `Created cohort batch ${batchCode} linked to program: ${programId}`,
         },
       });
+      return b;
     });
 
     revalidatePath("/admin/programs");
     revalidatePath("/admin/dashboard");
-    return { success: true };
+    return { success: true, batch };
   } catch (error: any) {
     console.error("Batch creation failure:", error);
     return { success: false, error: `Failed to create batch: ${error.message || error}` };
