@@ -21,7 +21,7 @@ export async function submitDailyCheckinAction(eodText: string) {
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    // Upsert attendance record for today (PENDING, 0% score until mentor accepts)
+    // Upsert attendance record for today (PRESENT, 100% score as per automated rule)
     await prisma.attendance.upsert({
       where: {
         studentId_date: {
@@ -30,15 +30,15 @@ export async function submitDailyCheckinAction(eodText: string) {
         },
       },
       update: {
-        score: 0,
-        status: "PENDING",
+        score: 100,
+        status: "PRESENT",
         details: eodText.trim(),
       },
       create: {
         studentId,
         date: todayDate,
-        score: 0,
-        status: "PENDING",
+        score: 100,
+        status: "PRESENT",
         details: eodText.trim(),
       },
     });

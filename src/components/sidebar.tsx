@@ -45,6 +45,7 @@ export default function Sidebar({ role, userName }: SidebarProps) {
         return [
           { name: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
           { name: "Interns", href: "/mentor/students", icon: Users },
+          { name: "Assignments", href: "/mentor/assignments", icon: FileCheck },
           { name: "Reviews", href: "/mentor/reviews", icon: CheckSquare },
           { name: "Meetings", href: "/mentor/meetings", icon: Calendar },
         ];

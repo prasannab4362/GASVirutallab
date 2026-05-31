@@ -160,6 +160,29 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
     }
   };
 
+  const getWeeklyAttendanceCount = (attendance: Attendance[]) => {
+    if (!attendance || attendance.length === 0) return 0;
+    
+    // Get current week Monday to Sunday
+    const now = new Date();
+    const currentDay = now.getDay();
+    const distanceToMonday = currentDay === 0 ? 6 : currentDay - 1;
+    
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - distanceToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    return attendance.filter(a => {
+      if (a.status !== "PRESENT") return false;
+      const d = new Date(a.date);
+      return d >= startOfWeek && d <= endOfWeek;
+    }).length;
+  };
+
   const filteredStudents = students.filter(s =>
     s.user.name.toLowerCase().includes(search.toLowerCase()) ||
     s.user.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -215,12 +238,21 @@ export default function MentorStudentsConsole({ students }: MentorStudentsConsol
                   <h4 className="font-bold text-zinc-950 dark:text-white text-sm leading-tight">{student.user.name}</h4>
                   <span className="text-[10px] text-zinc-550 font-mono">Matric: {student.matricNumber || "N/A"}</span>
                 </div>
-                {/* Graduation badge */}
-                {hasCert ? (
-                  <span className="shrink-0 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-bold border border-blue-150">Certified</span>
-                ) : isReady ? (
-                  <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-bold border border-emerald-150">Ready</span>
-                ) : null}
+                {/* Badges */}
+                <div className="flex flex-col gap-1 items-end">
+                  {hasCert ? (
+                    <span className="shrink-0 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-bold border border-blue-150">Certified</span>
+                  ) : isReady ? (
+                    <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-bold border border-emerald-150">Ready</span>
+                  ) : null}
+                  {(() => {
+                    const wAtt = getWeeklyAttendanceCount(student.attendance);
+                    if (wAtt >= 4) {
+                      return <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-[9px] font-bold border border-green-150">Weekly: {wAtt}/4</span>;
+                    }
+                    return <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[9px] font-bold border border-red-150">Weekly: {wAtt}/4</span>;
+                  })()}
+                </div>
               </div>
 
               {/* Profile items */}
