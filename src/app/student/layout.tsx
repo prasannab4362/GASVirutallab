@@ -15,6 +15,15 @@ export default async function StudentLayout({
     redirect("/login");
   }
 
+  // Verify that the user still exists in the database (handles database resets/wipes)
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+  });
+
+  if (!user || user.role !== "STUDENT") {
+    redirect("/login");
+  }
+
   // Fetch notifications
   const notifications = await prisma.notification.findMany({
     where: { userId: session.userId },

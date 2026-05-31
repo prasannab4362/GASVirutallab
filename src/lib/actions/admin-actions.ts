@@ -154,6 +154,14 @@ export async function createProgramAction(
       return { success: false, error: "Unauthorized access." };
     }
 
+    // Verify user exists in the database to prevent foreign key errors from stale sessions
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      return { success: false, error: "Your session is invalid or has expired. Please log out and sign in again." };
+    }
+
     if (!title || !description || !duration || !startDateInput || !endDateInput) {
       return { success: false, error: "Please fill out all fields." };
     }
@@ -206,6 +214,14 @@ export async function createBatchAction(
     const session = await getSession();
     if (!session || session.role !== "ADMIN") {
       return { success: false, error: "Unauthorized access." };
+    }
+
+    // Verify user exists in database to prevent foreign key errors from stale sessions
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      return { success: false, error: "Your session is invalid or has expired. Please log out and sign in again." };
     }
 
     if (!batchCode || !programId || !startDateInput || !endDateInput) {

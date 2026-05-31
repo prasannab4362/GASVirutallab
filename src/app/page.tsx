@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, ShieldCheck, CheckCircle2, AlertCircle, Sparkles, Send, HelpCircle, ArrowRight, BookOpen, Clock, Calendar, Check, GraduationCap, X, Loader2 } from "lucide-react";
 import { verifyCertificateAction } from "@/lib/actions/certificate-actions";
+import NeuralCanvas from "@/components/neural-canvas";
+import AIConsoleSimulator from "@/components/ai-console-simulator";
 
 export default function LandingPage() {
   const [certNumber, setCertNumber] = useState("");
@@ -73,40 +75,55 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-16 px-6 sm:px-12 max-w-7xl mx-auto flex flex-col items-center text-center overflow-hidden">
-        {/* Subtle decorative background gradients */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-400/10 blur-[120px] rounded-full -z-10" />
+      <section className="relative pt-24 pb-20 px-6 sm:px-12 max-w-7xl mx-auto overflow-hidden bg-grid-pattern rounded-b-[40px]">
+        {/* Subtle decorative background gradients - animated drifting glows */}
+        <div className="absolute top-10 left-1/4 w-[600px] h-[600px] bg-emerald-400/5 blur-[130px] rounded-full -z-10 animate-drift-slow" />
+        <div className="absolute -top-10 right-1/4 w-[500px] h-[500px] bg-green-500/5 blur-[120px] rounded-full -z-10 animate-drift-slower" />
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold mb-6 border border-blue-100 animate-pulse">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Advanced AI Cohort Starting Soon</span>
-        </div>
+        {/* Constellation background canvas */}
+        <NeuralCanvas />
 
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 max-w-4xl leading-tight">
-          Build Real AI Projects.<br />
-          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Learn From Industry Mentors.
-          </span>
-        </h1>
+        {/* 2-Column Grid Layout */}
+        <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center text-left relative z-10">
+          {/* Left Column - Copy content with staggered entry animations */}
+          <div className="lg:col-span-7 flex flex-col items-start space-y-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold border border-blue-100 animate-pulse">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Advanced AI Cohort Starting Soon</span>
+            </div>
 
-        <p className="mt-6 text-base sm:text-xl text-zinc-600 max-w-2xl leading-relaxed">
-          An intensive, hands-on fellowship platform. Code dynamic neural networks, deploy scalable RAG pipelines, and earn verified corporate certifications.
-        </p>
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-tight animate-fade-in-up">
+              Build Real AI Projects.<br />
+              <span className="bg-gradient-to-r from-blue-500 to-emerald-600 bg-clip-text text-transparent">
+                Learn From Industry Mentors.
+              </span>
+            </h1>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full justify-center">
-          <Link 
-            href="#programs" 
-            className="px-6 py-3.5 text-sm font-semibold rounded-2xl text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
-          >
-            <span>Explore Fellowships</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link 
-            href="#verification" 
-            className="px-6 py-3.5 text-sm font-semibold rounded-2xl text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200/80 transition-all flex items-center justify-center gap-2"
-          >
-            <span>Verify Credentials</span>
-          </Link>
+            <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl animate-fade-in-up [animation-delay:150ms]">
+              An intensive, hands-on fellowship platform. Code dynamic neural networks, deploy scalable RAG pipelines, and earn verified corporate certifications.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
+              <Link 
+                href="#programs" 
+                className="px-6 py-3.5 text-sm font-semibold rounded-2xl text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+              >
+                <span>Explore Fellowships</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link 
+                href="#verification" 
+                className="px-6 py-3.5 text-sm font-semibold rounded-2xl text-zinc-700 dark:text-zinc-250 bg-white dark:bg-zinc-900 hover:bg-zinc-55 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Verify Credentials</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Column - Console simulator with slight hover scale */}
+          <div className="lg:col-span-5 w-full animate-fade-in-up [animation-delay:200ms] hover:scale-[1.01] transition-transform duration-500">
+            <AIConsoleSimulator />
+          </div>
         </div>
       </section>
 
