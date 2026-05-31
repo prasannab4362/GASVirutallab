@@ -5,9 +5,10 @@ import Link from "next/link";
 import {
   Search, ShieldCheck, CheckCircle2, AlertCircle, Sparkles, Send,
   HelpCircle, ArrowRight, X, ChevronDown, Award, Users,
-  Zap, Check, Cpu, BookOpen, Clock, Calendar, Brain, Layers
+  Zap, Check, Cpu, BookOpen, Clock, Calendar, Brain, Layers, Loader2
 } from "lucide-react";
 import { verifyCertificateAction } from "@/lib/actions/certificate-actions";
+import { sendContactEmailAction } from "@/lib/actions/email-actions";
 import NeuralCanvas from "@/components/neural-canvas";
 import CinematicOrb from "@/components/cinematic-orb";
 
@@ -105,6 +106,8 @@ export default function LandingPage() {
   const [modalOpen,   setModalOpen]   = useState(false);
   const [contact,     setContact]     = useState({ name: "", email: "", message: "" });
   const [contactOk,   setContactOk]   = useState(false);
+  const [sendingContact, setSendingContact] = useState(false);
+  const [contactError,   setContactError]   = useState<string | null>(null);
   const [activeFaq,   setActiveFaq]   = useState<number | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [mousePos,    setMousePos]    = useState({ x: 50, y: 50 });
@@ -142,11 +145,26 @@ export default function LandingPage() {
     finally { setVerifying(false); }
   };
 
-  const handleContact = (e: React.FormEvent) => {
+  const handleContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    setContactOk(true);
-    setContact({ name: "", email: "", message: "" });
-    setTimeout(() => setContactOk(false), 5000);
+    if (!contact.name.trim() || !contact.email.trim() || !contact.message.trim()) return;
+
+    setSendingContact(true);
+    setContactError(null);
+    try {
+      const res = await sendContactEmailAction(contact.name, contact.email, contact.message);
+      if (res.success) {
+        setContactOk(true);
+        setContact({ name: "", email: "", message: "" });
+        setTimeout(() => setContactOk(false), 5000);
+      } else {
+        setContactError(res.error || "Failed to send message.");
+      }
+    } catch (err) {
+      setContactError("An unexpected error occurred. Please try again.");
+    } finally {
+      setSendingContact(false);
+    }
   };
 
   const faqs = [
@@ -546,10 +564,28 @@ export default function LandingPage() {
                     placeholder="Tell us about your background and interest..."
                     className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none" />
                 </div>
-                <button type="submit" suppressHydrationWarning className="relative w-full py-3.5 text-sm font-bold rounded-2xl text-white overflow-hidden group shadow-md shadow-emerald-500/15 hover:shadow-lg transition-shadow">
+                {contactError && (
+                  <div className="p-4 rounded-xl text-xs font-semibold bg-red-50 text-red-700 border border-red-150 flex items-center gap-2 animate-scale-in">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{contactError}</span>
+                  </div>
+                )}
+                <button type="submit" disabled={sendingContact} suppressHydrationWarning className="relative w-full py-3.5 text-sm font-bold rounded-2xl text-white overflow-hidden group shadow-md shadow-emerald-500/15 hover:shadow-lg transition-shadow disabled:opacity-60">
                   <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-all" />
                   <span className="absolute inset-0 beam-sweep" />
-                  <span className="relative flex items-center justify-center gap-2"><Send className="w-4 h-4" /> Send Message</span>
+                  <span className="relative flex items-center justify-center gap-2">
+                    {sendingContact ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Sending Message...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Send Message</span>
+                      </>
+                    )}
+                  </span>
                 </button>
               </form>
             </div>
