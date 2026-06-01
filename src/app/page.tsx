@@ -224,6 +224,17 @@ export default function LandingPage() {
             </span>
           </Link>
         </div>
+
+        {/* Mobile View - Only Portal Login */}
+        <div className="md:hidden flex items-center">
+          <Link href="/login" className="relative px-4 py-1.5 text-xs font-bold rounded-xl text-white overflow-hidden group shadow-md shadow-emerald-500/20 hover:shadow-lg transition-shadow">
+            <span className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 group-hover:from-emerald-500 group-hover:to-emerald-600 transition-all" />
+            <span className="absolute inset-0 beam-sweep" />
+            <span className="relative flex items-center gap-1.5">
+              Portal Login <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </Link>
+        </div>
       </nav>
 
       {/* ══ HERO ═════════════════════════════════════════════════════════ */}
