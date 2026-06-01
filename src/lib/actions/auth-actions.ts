@@ -32,6 +32,14 @@ export async function loginAction(prevState: any, formData: FormData) {
       return { success: false, error: `Invalid role selected for this account.` };
     }
 
+    if (user.role === "STUDENT" && !user.student) {
+      return { success: false, error: "Student profile is incomplete. Please contact support." };
+    }
+
+    if (user.role === "MENTOR" && !user.mentor) {
+      return { success: false, error: "Mentor profile is incomplete. Please contact support." };
+    }
+
     // Verify status is active
     if (user.status !== "ACTIVE") {
       return { success: false, error: "This account has been suspended." };

@@ -9,6 +9,20 @@ export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   const session = sessionToken ? await decrypt(sessionToken) : null;
 
+  // Detect if the session is from an old database state (missing profile IDs)
+  if (session) {
+    const isCorrupt = 
+      (session.role === "MENTOR" && !session.mentorId) || 
+      (session.role === "STUDENT" && !session.studentId);
+      
+    if (isCorrupt) {
+      const loginUrl = new URL("/login", request.url);
+      const res = NextResponse.redirect(loginUrl);
+      res.cookies.delete("session");
+      return res;
+    }
+  }
+
   // Define route protections
   const isStudentRoute = pathname.startsWith("/student");
   const isMentorRoute = pathname.startsWith("/mentor");
