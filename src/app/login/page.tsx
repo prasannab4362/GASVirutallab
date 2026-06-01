@@ -78,6 +78,7 @@ export default function LoginPage() {
               <button
                 key={role}
                 type="button"
+                suppressHydrationWarning
                 onClick={() => {
                   setSelectedRole(role);
                   setError(null);
@@ -107,7 +108,7 @@ export default function LoginPage() {
         )}
 
         {/* Login Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit} suppressHydrationWarning>
           <div className="space-y-4">
             {/* Email Field */}
             <div>
@@ -122,6 +123,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   required
+                  suppressHydrationWarning
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-11 pr-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 dark:focus:ring-blue-600/20 dark:focus:border-blue-500 text-sm transition-all"
@@ -143,6 +145,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   required
+                  suppressHydrationWarning
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-11 pr-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-950 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 dark:focus:ring-blue-600/20 dark:focus:border-blue-500 text-sm transition-all"
@@ -156,6 +159,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
+              suppressHydrationWarning
               className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent rounded-2xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all"
             >
               {isLoading ? (
