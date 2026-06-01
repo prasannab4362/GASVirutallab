@@ -46,6 +46,7 @@ model User {
   mentor        Mentor?
   notifications Notification[]
   auditLogs     AuditLog[]
+  chatMessages  ChatMessage[]
 }
 
 model Student {
@@ -64,12 +65,13 @@ model Student {
 }
 
 model Mentor {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  batches   Batch[]
-  projects  Project[]
-  meetings  Meeting[]
+  id             String          @id @default(uuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batches        Batch[]
+  projects       Project[]
+  meetings       Meeting[]
+  studyMaterials StudyMaterial[]
 }
 
 model Program {
@@ -98,10 +100,12 @@ model Batch {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   program     Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
-  mentor      Mentor?      @relation(fields: [mentorId], references: [id])
-  students    Student[]
-  assignments Assignment[]
-  meetings    Meeting[]
+  mentor         Mentor?         @relation(fields: [mentorId], references: [id])
+  students       Student[]
+  assignments    Assignment[]
+  meetings       Meeting[]
+  studyMaterials StudyMaterial[]
+  chatMessages   ChatMessage[]
 }
 
 model Project {
@@ -220,4 +224,26 @@ model ProjectTask {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model StudyMaterial {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  fileUrl     String?  // Drive link or PDF URL
+  batchId     String
+  mentorId    String
+  createdAt   DateTime @default(now())
+  batch       Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  content   String
+  batchId   String
+  senderId  String   // User ID
+  createdAt DateTime @default(now())
+  batch     Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }

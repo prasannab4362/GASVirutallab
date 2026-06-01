@@ -24,6 +24,8 @@ async function main() {
 
   // 1. Drop existing tables in dependency order to prevent foreign key constraint errors
   const dropTables = [
+    'DROP TABLE IF EXISTS "ChatMessage";',
+    'DROP TABLE IF EXISTS "StudyMaterial";',
     'DROP TABLE IF EXISTS "ProjectTask";',
     'DROP TABLE IF EXISTS "AuditLog";',
     'DROP TABLE IF EXISTS "Notification";',

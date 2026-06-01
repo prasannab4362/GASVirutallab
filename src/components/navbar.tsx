@@ -49,6 +49,7 @@ export default function Navbar({ role, userName, notifications }: NavbarProps) {
       case "ADMIN":
         return [
           { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+          { name: "Workspaces", href: "/admin/oversight", icon: Briefcase },
           { name: "Interns", href: "/admin/students", icon: Users },
           { name: "Mentors", href: "/admin/mentors", icon: ShieldAlert },
           { name: "Programs", href: "/admin/programs", icon: Layers },
