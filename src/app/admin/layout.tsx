@@ -12,7 +12,7 @@ export default async function AdminLayout({
   const session = await getSession();
   
   if (!session || session.role !== "ADMIN") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Verify that the user still exists in the database (handles database resets/wipes)
@@ -21,7 +21,7 @@ export default async function AdminLayout({
   });
 
   if (!user || user.role !== "ADMIN") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Fetch notifications

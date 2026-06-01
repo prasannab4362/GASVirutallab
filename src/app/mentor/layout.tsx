@@ -12,7 +12,7 @@ export default async function MentorLayout({
   const session = await getSession();
   
   if (!session || session.role !== "MENTOR") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Verify that the user still exists in the database (handles database resets/wipes)
@@ -21,7 +21,7 @@ export default async function MentorLayout({
   });
 
   if (!user || user.role !== "MENTOR") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Fetch notifications

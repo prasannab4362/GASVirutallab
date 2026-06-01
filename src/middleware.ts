@@ -9,6 +9,20 @@ export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get("session")?.value;
   const session = sessionToken ? await decrypt(sessionToken) : null;
 
+  // Handle explicit session clearing (e.g., from layout.tsx when DB record is missing)
+  if (request.nextUrl.searchParams.get("clear") === "1") {
+    const loginUrl = new URL("/login", request.url);
+    const res = NextResponse.redirect(loginUrl);
+    res.cookies.set("session", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: new Date(0),
+      path: "/",
+    });
+    return res;
+  }
+
   // Detect if the session is from an old database state (missing profile IDs)
   if (session) {
     const isCorrupt = 
@@ -18,7 +32,13 @@ export async function middleware(request: NextRequest) {
     if (isCorrupt) {
       const loginUrl = new URL("/login", request.url);
       const res = NextResponse.redirect(loginUrl);
-      res.cookies.delete("session");
+      res.cookies.set("session", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        expires: new Date(0),
+        path: "/",
+      });
       return res;
     }
   }

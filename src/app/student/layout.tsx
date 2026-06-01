@@ -12,7 +12,7 @@ export default async function StudentLayout({
   const session = await getSession();
   
   if (!session || session.role !== "STUDENT") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Verify that the user still exists in the database (handles database resets/wipes)
@@ -21,7 +21,7 @@ export default async function StudentLayout({
   });
 
   if (!user || user.role !== "STUDENT") {
-    redirect("/login");
+    redirect("/login?clear=1");
   }
 
   // Fetch notifications
