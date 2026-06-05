@@ -206,7 +206,7 @@ export default function LandingPage() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="https://gas-ai.vercel.app/" target="_blank" rel="noopener noreferrer" className="relative text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors group">
+          <a href="https://www.gasai.in/" target="_blank" rel="noopener noreferrer" className="relative text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors group">
             Corporate Site
             <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-emerald-500 rounded-full group-hover:w-full transition-all duration-300" />
           </a>
@@ -283,7 +283,7 @@ export default function LandingPage() {
                   Explore Programs <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
-              <a href="https://gas-ai.vercel.app/" target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 text-sm font-bold rounded-2xl text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 transition-all flex items-center gap-2 shadow-sm hover:shadow-md">
+              <a href="https://www.gasai.in/" target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 text-sm font-bold rounded-2xl text-zinc-700 bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 transition-all flex items-center gap-2 shadow-sm hover:shadow-md">
                 <Sparkles className="w-4 h-4 text-emerald-600 animate-pulse" />
                 Corporate Site
               </a>
@@ -616,7 +616,7 @@ export default function LandingPage() {
           </Link>
 
           <div className="flex items-center gap-8">
-            <a href="https://gas-ai.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors">Corporate Site</a>
+            <a href="https://www.gasai.in/" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors">Corporate Site</a>
             {[["#programs", "Programs"], ["#verification", "Verify"], ["#contact", "Contact"]].map(([href, label]) => (
               <Link key={href} href={href} className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors">{label}</Link>
             ))}
